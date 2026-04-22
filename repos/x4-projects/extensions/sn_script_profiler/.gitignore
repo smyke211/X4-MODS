@@ -1,0 +1,8 @@
+*.json
+plugin_log.txt
+# Everything in aiscripts (generated)
+aiscripts/*
+# Everything in md.
+md/*
+# The user custom config.ini.
+config.ini

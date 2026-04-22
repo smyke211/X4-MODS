@@ -1,0 +1,76 @@
+@import "animation";
+@import "toggle";
+
+*:focus,
+*:active{
+  box-shadow: none!important;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: $bgDarker;
+
+  &.font-size-1 {
+    font-size: 16px;
+  }
+
+  &.font-size-2 {
+    font-size: 17px;
+  }
+
+  &.font-size-3 {
+    font-size: 18px;
+  }
+
+  @media (min-width: 990px) {
+    //overflow: hidden;
+  }
+}
+
+
+p {
+  line-height: 1.5;
+}
+
+.header {
+  .font-size {
+    font-size: 1.2rem;
+  }
+}
+
+.page-content {
+  padding-bottom: 0;
+  min-height: auto;
+}
+
+.btn:focus,
+.btn-check:focus + .btn-primary,
+.btn-primary:focus,
+.btn-primary.active:focus {
+  box-shadow: none;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  color: #cbcbcb;
+}
+
+.fa-icon {
+  width: 1.4em !important;
+}
+
+.nav-link {
+  display: inline-block;
+}
+.toggle-off {
+  color: #ccc;
+  border-color: #666;
+  background: #666;
+}
+.toggle-on {
+  color: #000;
+  border-color: #666;
+  background: #ccc;
+}

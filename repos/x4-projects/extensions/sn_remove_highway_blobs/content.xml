@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content 
+  id="ws_2094663437" 
+  name="Remove Red Blobs from Super Highways" 
+  description=" "
+  author="SirNukes" 
+  version="001" 
+  date="2020-4-23" 
+  save="false" 
+  sync="false">
+
+  <text language="7"  description=" "/>
+  <text language="33" description=" "/>
+  <text language="37" description=" "/>
+  <text language="39" description=" "/>
+  <text language="44" description="Removes the red blobs flown through on super highways."/>
+  <text language="49" description=" "/>
+  <text language="55" description=" "/>
+  <text language="81" description=" "/>
+  <text language="82" description=" "/>
+  <text language="86" description=" "/>
+  <text language="88" description=" "/>
+
+</content>

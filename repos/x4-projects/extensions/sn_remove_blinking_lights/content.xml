@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<content 
+  author="SirNukes" 
+  date="2020-04-08" 
+  enabled="true" 
+  id="ws_2054542456" 
+  name="Remove Blinking Ship Lights" 
+  description=" "
+  save="false" 
+  sync="false" 
+  version="105">
+  
+  <text description=" " language="7"/>
+  <text description=" " language="33"/>
+  <text description=" " language="37"/>
+  <text description=" " language="39"/>
+  <text description="Remove blinking navigation lights from ships." language="44"/>
+  <text description=" " language="49"/>
+  <text description=" " language="55"/>
+  <text description=" " language="81"/>
+  <text description=" " language="82"/>
+  <text description=" " language="86"/>
+  <text description=" " language="88"/>
+</content>

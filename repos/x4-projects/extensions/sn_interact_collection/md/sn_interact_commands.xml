@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="SN_Interact_Commands" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+<cues>
+
+  <!--
+      Text storage cue, for easier lookup in general.
+      Members are descriptive names of the text strings, prefixed with $.
+    -->
+  <cue name="Text"/>
+  <library name="Load_Text">
+    <actions>
+      <set_value exact="{68537, 5000}" name="Text.$Follow" />
+    </actions>
+  </library>
+
+  <cue name="Add_Interact_Actions" instantiate="true">
+    <conditions>
+      <event_cue_signalled cue="md.Interact_Menu_API.Get_Actions" />
+    </conditions>
+    <actions>
+      <set_value name="$texts" exact="event.param.$texts"/>
+      <set_value name="$target" exact="event.param.$object"/>
+      
+      <!--TODO: load text on reloads or lua load.-->
+      <include_actions ref="Load_Text"/>
+
+      <!--Check that the player is piloting, and target is followable.-->
+      <!--TODO: maybe show_PlayerInteractions check.-->
+      <!--TODO: interaction doesn't support text2?-->
+      <do_if value="event.param.$showPlayerInteractions and $target.isclass.{class.destructible} ">
+        <signal_cue_instantly
+          cue="md.Interact_Menu_API.Add_Action"
+          param = "table[
+            $id         = 'target_follow',
+            $section    = 'interaction',
+            $text       = Text.$Follow,
+            $text2      = $texts.$targetBaseOrShortName,
+            $mouseover  = '%s %s'.[Text.$Follow, $target.name],
+            $icon       = 'order_follow',
+            $mouseover_icon = 'order_follow',
+            $callback   = Target_Follow,
+            ]"/>        
+      </do_if>      
+    </actions>
+  </cue>
+
+  <!-- Auto-follow selected ship. -->
+  <cue name="Target_Follow" instantiate="true" namespace="this">
+    <conditions>
+      <event_cue_signalled/>
+      <!-- Verify the player is piloting a ship.-->
+      <check_value value="player.occupiedship"/>
+    </conditions>
+    <actions>
+      <!-- Debug message. -->
+      <!--<signal_cue_instantly cue="md.Chat_Window_API.Print" param="'InteractMenu;Starting Target_Follow'"/>-->
+      <!--<debug_text text="'InteractMenu Triggered Target_Follow'" filter="general"/>-->
+
+      <start_player_autopilot destination="event.param.$object"/>
+    </actions>
+  </cue>
+
+</cues>
+
+</mdscript>
+
+
+

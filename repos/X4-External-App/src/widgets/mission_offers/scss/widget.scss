@@ -1,0 +1,46 @@
+@import "variables";
+
+.accordion {
+  .accordion-button {
+    padding: 0.4rem 0.4rem 0.4rem 0;
+
+    &:not(.collapsed) {
+      background: none;
+      box-shadow: none;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    .mission-group {
+      flex-basis: 70px;
+    }
+
+    .group-type {
+      flex-basis: 70px;
+      height: 22px;
+    }
+
+    .group-name {
+      min-width: 85%;
+    }
+  }
+}
+
+.bg-primary-outline {
+  background: none;
+  border: $color1 1px solid !important;
+  color: $color1 !important;
+  font-weight: 100 !important;
+}
+
+.svg-inline--fa {
+  &.cursor-pointer {
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 0.5;
+    }
+  }
+}

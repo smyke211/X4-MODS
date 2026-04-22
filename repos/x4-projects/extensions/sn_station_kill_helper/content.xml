@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content 
+  id="ws_2042915001" 
+  name="Station Kill Helper" 
+  description=" "
+  author="SirNukes" 
+  version="101" 
+  date="2020-3-29" 
+  save="false" 
+  sync="false">
+
+  <text language="7"  description=" "/>
+  <text language="33" description=" "/>
+  <text language="37" description=" "/>
+  <text language="39" description=" "/>
+  <text language="44" description="Forcibly destroys stations at ~0% health, as a workaround to stations refusing to die."  />
+  <text language="49" description=" "/>
+  <text language="55" description=" "/>
+  <text language="81" description=" "/>
+  <text language="82" description=" "/>
+  <text language="86" description=" "/>
+  <text language="88" description=" "/>
+
+</content>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="Interact_Menu_API_Test" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+<cues>
+
+  <!-- Listen from the menu api reloading. -->
+  <cue name="Reset_On_Reload" instantiate="true">
+    <conditions>
+      <event_cue_signalled cue="md.Interact_Menu_API.Reloaded"/>
+    </conditions>
+    <actions>
+      <!--Version with a condition flag.-->
+      <signal_cue_instantly
+        cue="md.Interact_Menu_API.Register_Action"
+        param = "table[
+          $id         = 'test',
+          $text       = 'Test',
+          $mouseover  = 'mouseover',
+          $callback   = Test_Callback,
+          $enabled_conditions = ['class_ship'],
+          ]"/>
+    </actions>
+  </cue>
+
+  <cue name="Test_onDisplay" instantiate="true">
+    <conditions>
+      <event_cue_signalled cue="md.Interact_Menu_API.Get_Actions" />
+    </conditions>
+    <actions>
+      <set_value name="$texts" exact="event.param.$texts"/>
+      <set_value name="$target" exact="event.param.$object"/>
+      
+      <!-- Announce the event. -->
+      <set_value name="$msg" exact="'interact;target: %s (%s)'.[
+                          $target, $texts.$targetBaseOrShortName ]"/>
+      <signal_cue_instantly cue="md.Chat_Window_API.Print" param="$msg"/>
+      <debug_text text="$msg" chance="100" filter="general"/>
+            
+      <!--Decide if this should show.-->
+      <do_if value="$target.isclass.{class.ship}">
+        <!--Specify a menu item to include.-->
+        <signal_cue_instantly
+          cue="md.Interact_Menu_API.Add_Action"
+          param = "table[
+            $id         = 'test2',
+            $text       = 'Test2',
+            $text2      = $texts.$targetBaseOrShortName,
+            $mouseover  = 'squeek',
+            $callback   = Test_Callback,
+            $icon       = 'hud_ms_dumbfire_heavy_mk1',
+            $mouseover_icon = 'hud_drone_attackenemies',
+          ]"/>
+        
+        <!--Try a nested command.-->
+        <signal_cue_instantly
+          cue="md.Interact_Menu_API.Add_Action"
+          param = "table[
+            $id         = 'test_nest1',
+            $section    = 'consumables_civilian',
+            $text       = 'Nest1',
+            $text2      = $texts.$targetBaseOrShortName,
+            $mouseover  = 'smaller squeek',
+            $callback   = Test_Callback,
+            $icon       = 'faction_argon',
+            $mouseover_icon = 'faction_argon',
+          ]"/>
+      </do_if>
+
+      <do_if value="$target.isclass.{class.station}">
+        <signal_cue_instantly
+          cue="md.Interact_Menu_API.Add_Action"
+          param = "table[
+            $id         = 'test3',
+            $text       = 'Stay Open',
+            $mouseover  = 'squak',
+            $callback   = Test_Callback,
+            $keep_open  = true,
+            $icon       = 'weaponmode_defend',
+            $mouseover_icon = 'weaponmode_defend',
+          ]"/>
+      </do_if>
+
+    </actions>
+  </cue>
+
+  <cue name="Test_Callback" instantiate="true">
+    <conditions>
+      <event_cue_signalled />
+    </conditions>
+    <actions>
+      <!-- Log it. -->
+      <signal_cue_instantly cue="md.Chat_Window_API.Print"
+                        param="'action;%s'.[ event.param.$id ]"/>
+      
+      <!--If this is the Stay Open test, try de-activating it.
+          Note: currently this has no visible effect since the menu isn't dynamic.
+      -->
+      <do_if value="event.param.$id == 'test3'">
+        <signal_cue_instantly
+          cue="md.Interact_Menu_API.Update_Action"
+          param = "table[
+          $id         = event.param.$id,
+          $active     = false,
+        ]"/>
+      </do_if>
+    
+    </actions>
+  </cue>
+    
+</cues>
+
+</mdscript>
+
+
+

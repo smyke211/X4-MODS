@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="Lua_Loader" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!--Note: keep the MD name convenient for users.-->
+
+<cues>
+  
+  <!-- Tell the lua side that the game loaded. -->
+  <cue name="Reload_Listener" instantiate="true" namespace="this">
+    <conditions>
+      <check_any>
+        <event_game_loaded/>
+        <event_game_started/>
+      </check_any>
+    </conditions>    
+    <actions>
+      <raise_lua_event name="'Lua_Loader.Send_Priority_Ready'"/>
+    </actions>
+  </cue>
+
+  <!--Wait for lua side to send the Priority_Ready, and trigger normal Ready.-->
+  <cue name="Send_Ready" instantiate="true" namespace="this">
+    <conditions>
+      <event_ui_triggered screen="'Lua_Loader'" control="'Priority_Ready'" />
+    </conditions>
+    <actions>
+      <raise_lua_event name="'Lua_Loader.Send_Ready'"/>
+    </actions>
+  </cue>
+
+</cues>
+
+</mdscript>

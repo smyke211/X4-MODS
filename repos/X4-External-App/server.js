@@ -1,0 +1,229 @@
+const fs = require('fs');
+const path = require('path');
+const dotenvAbsolutePath = path.join(__dirname, '.env');
+require('dotenv').config({ path: dotenvAbsolutePath });
+const net = require("node:net");
+
+const bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+
+const hostname = process.env.APP_HOST || '127.0.0.1';
+const port = process.env.APP_PORT || 8080;
+
+const chalk = require('chalk');
+const { version } = require("./package.json");
+const { normalizeObjectRecursively } = require('./utils/textProcessor');
+
+const isPackaged = !!process.pkg;
+const runtimeDir = isPackaged ? path.dirname(process.execPath) : __dirname;
+const devFilePath = path.join(runtimeDir, 'dev-data.json');
+
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+
+class Server {
+    dataObject = null;
+    updatePending = false;
+    lastOutputMessage = null;
+
+    constructor (app, hostname, port) {
+        this.app = app;
+        this.hostname = hostname;
+        this.port = port;
+    }
+
+    /**
+     * Merge new entries into existing ones, deduplicating by key and sorting by time (newest first)
+     */
+    mergeEntries (existing, incoming, key) {
+        if (!existing || !Array.isArray(existing)) {
+            return incoming;
+        }
+
+        const compositeKey = (entry) => `${entry[key]}_${entry.time}`;
+
+        const map = new Map();
+        for (const entry of existing) {
+            map.set(compositeKey(entry), entry);
+        }
+        for (const entry of incoming) {
+            map.set(compositeKey(entry), entry);
+        }
+
+        return Array.from(map.values()).sort((a, b) => (b.time || 0) - (a.time || 0));
+    }
+
+    /**
+     * Check if new release is out
+     */
+    checkVersion () {
+        const versionCheck = require('github-version-checker');
+        const { version } = require('./package.json');
+
+        const options = {
+            token: '',
+            repo: 'X4-External-App',
+            owner: 'mycumycu',
+            currentVersion: version,
+        };
+
+        versionCheck(options, null).then((update) => {
+            if (update) { // update is null if there is no update available, so check here
+                this.outputMessage(chalk.yellow(`An update is available: ${update.name}\nYou are on version ${options.currentVersion}!`));
+                this.updatePending = true;
+            } else {
+                this.outputMessage(chalk.green(`You are up to date.`));
+            }
+        }).catch(function () {
+            console.error(chalk.red(`Couldn't connect to github server to check updates.`));
+        });
+
+        return this
+    }
+
+    /**
+     *
+     */
+    serve () {
+        let serveStatic = require('serve-static');
+        let portfinder = require('portfinder');
+        let localIpV4Address = require("local-ipv4-address");
+
+        localIpV4Address()
+            .catch((err) => {
+                const reason = (err && err.message) ? err.message : String(err);
+                this.outputMessage(chalk.yellow(`Could not determine LAN IPv4 address (${reason}).`));
+                this.outputMessage(chalk.yellow(`Tip: On some Linux systems, installing 'net-tools' (which includes the 'netstat' command) may help.`));
+                return null;
+            })
+            .then((ipAddress) => {
+                portfinder.getPort({ port: this.port }, (err, port) => {
+                    this.app.use(serveStatic(path.join(__dirname, 'dist'), {
+                        etag: false,
+                        lastModified: false,
+                        cacheControl: false,
+                        maxAge: 0,
+                        setHeaders: (res) => {
+                            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+                            res.setHeader('Pragma', 'no-cache');
+                            res.setHeader('Expires', '0');
+                            res.setHeader('Surrogate-Control', 'no-store');
+                        }
+                    }));
+                    this.app.listen(port, () => {
+                        require('child_process').exec(`start http://${this.hostname}:${port}`);
+
+                        this.outputMessage(`*********************************************`);
+                        this.outputMessage(`** Server running at http://${this.hostname}:${port}`);
+                        this.outputMessage(
+                            ipAddress ?
+                                `** Local IPv4 address: ${ipAddress}` :
+                                `** Local IPv4 address: unavailable (local IPv4 not detected)`
+                        );
+                        this.outputMessage(`*********************************************`);
+
+                        this.checkPortChange(port)
+                    });
+                });
+            })
+
+        return this
+    }
+
+    /**
+     * Notify user if the port has changed
+     */
+    checkPortChange (port) {
+        if (port !== parseInt(this.port)) {
+            this.outputMessage(chalk.yellow(`Port ${this.port} is already in use. Using port ${port} instead.`));
+            this.outputMessage(chalk.yellow(`Update the relevant port settings in the '\\extensions\\mycu_external_app\\ui\\config.lua' file.`));
+            this.outputMessage();
+        }
+    }
+
+    /**
+     *
+     */
+    setApi () {
+        /**
+         * Handle data consumed by components
+         */
+        this.app.get('/api/data', (request, response) => {
+            if (!isPackaged && fs.existsSync(devFilePath)) {
+                try {
+                    // In local env - load from file
+                    const raw = fs.readFileSync(devFilePath, 'utf8');
+                    this.dataObject = JSON.parse(raw);
+                } catch (e) {
+                    console.error(chalk.red(`Failed to load ${devFilePath}:`), e);
+                }
+            }
+
+            if (this.dataObject) {
+                this.dataObject.updatePending = this.updatePending;
+            }
+
+            response.json(this.dataObject);
+        });
+
+        /**
+         * Handle incoming data from X4
+         */
+        this.app.post('/api/data', (request, response) => {
+            // Normalize output (handle line breaks, color codes, etc.)
+            const newData = normalizeObjectRecursively(request.body);
+
+            // Incrementally accumulate list-type data instead of replacing
+            if (newData.transactionLog && Array.isArray(newData.transactionLog)) {
+                newData.transactionLog = this.mergeEntries(
+                    this.dataObject?.transactionLog, newData.transactionLog, 'entryid'
+                );
+            }
+            if (newData.logbook && Array.isArray(newData.logbook)) {
+                newData.logbook = this.mergeEntries(
+                    this.dataObject?.logbook, newData.logbook, 'id'
+                );
+            }
+
+            // Merge new data with existing
+            this.dataObject = { ...this.dataObject, ...newData };
+
+            if (!isPackaged) {
+                try {
+                    if (!fs.existsSync(devFilePath) && this.dataObject != null) {
+                        // In local env: create dev-data.json
+                        fs.writeFileSync(devFilePath, JSON.stringify(this.dataObject, null, 2));
+                        this.outputMessage(chalk.green(`Development data file created at ${devFilePath}`));
+                    }
+                } catch (e) {
+                    console.error(chalk.red(`Failed to write ${devFilePath}:`), e);
+                }
+            }
+
+            response.send('ok');
+        });
+
+        return this
+    }
+
+    /**
+     * Output console messages in non-spammer style
+     * @param message
+     */
+    outputMessage (message = '') {
+        if (this.lastOutputMessage !== message) {
+            console.log(message)
+            this.lastOutputMessage = message;
+        }
+
+        return this
+    }
+}
+
+const server = new Server(app, hostname, port)
+server.outputMessage(chalk.green(`X4 External App Server v${version}`))
+    .serve()
+    .setApi()
+    .checkVersion()
+    .outputMessage()

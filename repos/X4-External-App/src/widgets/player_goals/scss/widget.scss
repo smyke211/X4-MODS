@@ -1,0 +1,26 @@
+@import "variables";
+
+h6 {
+  &.empty {
+    opacity: 0.5;
+  }
+}
+
+.empty-placeholder {
+  opacity: 0.4;
+  font-style: italic;
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+
+.no-move {
+  transition: transform 0s;
+}
+.nav-link {
+  display: inline-block;
+}

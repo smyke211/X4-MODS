@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="SN_Extra_Game_Options" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+  <!--
+  MD side of the new game options.
+  Most of the crunchy code is in lua.
+  -->
+
+  <cues>
+
+    <!--
+      Text storage cue, for easier lookup in general.
+      Members are descriptive names of the text strings, prefixed with $.
+    -->
+    <cue name="Text"/>
+    <library name="Load_Text">
+      <actions>
+        <set_value exact="{68537, 2000}" name="Text.$disable_animations_name" />
+        <set_value exact="{68537, 2001}" name="Text.$disable_animations_mouseover" />
+        <set_value exact="{68537, 2002}" name="Text.$disable_helptext_name" />
+        <set_value exact="{68537, 2003}" name="Text.$disable_helptext_mouseover" />
+        <set_value exact="{68537, 2004}" name="Text.$tooltip_fontsize_name" />
+        <set_value exact="{68537, 2005}" name="Text.$tooltip_fontsize_mouseover" />
+        <set_value exact="{68537, 2006}" name="Text.$map_menu_alpha_name" />
+        <set_value exact="{68537, 2007}" name="Text.$map_menu_alpha_mouseover" />
+        <set_value exact="{68537, 2008}" name="Text.$map_menu_player_focus_name" />
+        <set_value exact="{68537, 2009}" name="Text.$map_menu_player_focus_mouseover" />
+        <!--<set_value exact="{68537, 2010}" name="Text.$adjust_fov_name" />
+        <set_value exact="{68537, 2011}" name="Text.$adjust_fov_mouseover" />-->
+        <set_value exact="{68537, 2012}" name="Text.$map_menu_zoom_name" />
+        <set_value exact="{68537, 2013}" name="Text.$map_menu_zoom_mouseover" />
+        <!--<set_value exact="{68537, 2014}" name="Text.$tooltip_on_truncation_name" />
+        <set_value exact="{68537, 2015}" name="Text.$tooltip_on_truncation_mouseover" />-->
+        <set_value exact="{68537, 2016}" name="Text.$traffic_density_name" />
+        <set_value exact="{68537, 2017}" name="Text.$traffic_density_mouseover" />
+        <set_value exact="{68537, 2018}" name="Text.$autopause_on_load_name" />
+        <set_value exact="{68537, 2019}" name="Text.$autopause_on_load_mouseover" />
+      </actions>
+    </library>
+    
+    <!--Static cue for saving globals.-->
+    <cue name="Globals">
+      <actions>
+        <set_value name="$load_trigger" exact="false"/>
+      </actions>
+    </cue>
+
+    <!--Listen from the menu api reloading. -->
+    <cue name="Reset_On_Reload" instantiate="true">
+      <conditions>
+        <event_cue_signalled cue="md.Simple_Menu_Options.Reloaded"/>
+      </conditions>
+      <actions>
+        <include_actions ref="Load_Text"/>
+        
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'disable_animations',
+            $name       = Text.$disable_animations_name,
+            $mouseover  = Text.$disable_animations_mouseover,
+            $default    = 0,
+            $type       = 'button',
+            $callback   = OnChange,
+            ]"/>
+
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'disable_helptext',
+            $name       = Text.$disable_helptext_name,
+            $mouseover  = Text.$disable_helptext_mouseover,
+            $default    = 0,
+            $type       = 'button',
+            $callback   = OnChange,
+            ]"/>
+        
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'tooltip_fontsize',
+            $name       = Text.$tooltip_fontsize_name,
+            $mouseover  = Text.$tooltip_fontsize_mouseover,
+            $default    = 9,
+            $type       = 'slidercell',
+            $args       = table[
+              $min      = 9,
+              $max      = 12,
+              $suffix   = 'pt',
+              $hideMaxValue = true,
+            ],
+            $callback   = OnChange,
+            ]"/>
+
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'map_menu_alpha',
+            $name       = Text.$map_menu_alpha_name,
+            $mouseover  = Text.$map_menu_alpha_mouseover,
+            $default    = 98,
+            $type       = 'slidercell',
+            $args       = table[
+              $min      = 90,
+              $max      = 100,
+              $suffix   = '%',
+              $hideMaxValue = true,
+            ],
+            $callback   = OnChange,
+            ]"/>
+
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'map_menu_player_focus',
+            $name       = Text.$map_menu_player_focus_name,
+            $mouseover  = Text.$map_menu_player_focus_mouseover,
+            $default    = 0,
+            $type       = 'button',
+            $callback   = OnChange,
+            ]"/>
+
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'map_menu_zoom',
+            $name       = Text.$map_menu_zoom_name,
+            $mouseover  = Text.$map_menu_zoom_mouseover,
+            $default    = 0,
+            $type       = 'slidercell',
+            $args       = table[
+              $min      = 0,
+              $max      = 100,
+              $suffix   = '',
+              $hideMaxValue = true,
+            ],
+            $callback   = OnChange,
+            ]"/>
+
+        <!--Unobtrusive, so default to on.-->
+        <!--Note: removing tooltips, since redundant with 5.10-->
+        <!--<signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'tooltip_on_truncation',
+            $name       = Text.$tooltip_on_truncation_name,
+            $mouseover  = Text.$tooltip_on_truncation_mouseover,
+            $default    = 1,
+            $type       = 'button',
+            $callback   = OnChange,
+            ]"/>-->
+
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'autopause_on_load',
+            $name       = Text.$autopause_on_load_name,
+            $mouseover  = Text.$autopause_on_load_mouseover,
+            $default    = 0,
+            $type       = 'button',
+            $callback   = OnChange,
+            ]"/>
+
+        <!--This one is special: value is stored in config.xml, read from lua.
+            Default taken from lua response.
+        -->
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $id         = 'traffic_density',
+            $name       = Text.$traffic_density_name,
+            $mouseover  = Text.$traffic_density_mouseover,
+            $default    = 100,
+            $skip_initial_callback = 1,
+            $type       = 'slidercell',
+            $args       = table[
+              $min      = 0,
+              $max      = 100,
+              $suffix   = '%',
+              $hideMaxValue = true,
+            ],
+            $callback   = OnChange,
+            ]"/>
+
+        
+        <!--Removed; doesn't work well. See lua for comments on why, but
+            in short: the fov value to actual angle scaling isn't const,
+            and keeps resetting on camera changes (eg. hopping into spacesuit),
+            leading to drift and general instability.
+        <signal_cue_instantly
+          cue="md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $disabled   = true,
+            $id         = 'adjust_fov',
+            $name       = Text.$adjust_fov_name,
+            $mouseover  = Text.$adjust_fov_mouseover,
+            $default    = 10,
+            $type       = 'slidercell',
+            $args       = table[
+              $min      = 1,
+              $max      = 20,
+              $suffix   = '',
+              $hideMaxValue = true,
+            ],
+            $callback   = OnChange,
+            ]"/>-->
+
+        <!--Load lua-stored values.-->
+        <raise_lua_event name="'Extra_Game_Options.get_lua_values'"/>
+        
+      </actions>
+    </cue>
+
+    <!--Bounce values from lua to md options.
+        Used currently for traffic density.
+    -->
+    <cue name="Init_Lua_Values" instantiate="true">
+      <conditions>
+        <event_ui_triggered screen="'Extra_Game_Options'" control="'return_lua_values'" />
+      </conditions>
+      <actions>
+        <do_for_each name="$id" valuename="$value" in="event.param3">
+          <signal_cue_instantly
+            cue="md.Simple_Menu_Options.Write_Option_Value"
+            param = "table[
+                $id         = $id,
+                $value      = $value,
+                ]"/>
+        </do_for_each>
+      </actions>
+    </cue>
+
+    <!--For autopause, detect when a game is started or loaded, and only
+        trigger pausing at that point.
+        
+        This is a little tricky, in that the prior option selection will
+        not be ready to read (from userdata) immediately on reload.
+        However, if waiting for the signal that userdata is ready, it will
+        be send on any /reloadui command, not just on a game load.
+        
+        Here, save/load is detected and sets a trigger variable.
+        Then, userdata loading is detected, and if the trigger is set,
+        runs the autopause logic and clears the trigger.
+        -->
+    <cue name="Detect_Load" instantiate="true">
+      <conditions>
+        <check_any>
+          <event_game_loaded/>
+          <event_game_started/>
+        </check_any>
+      </conditions>
+      <actions>
+        <set_value name="Globals.$load_trigger" exact="true"/>
+      </actions>
+    </cue>
+    
+    <!--
+      Signal lua with value changes.
+      This will be called once for each option upon menu setup at the
+      start of a game (or reloadui), as well as when the player changes values.
+    -->
+    <cue name="OnChange" instantiate="true">
+      <conditions>
+        <event_cue_signalled />
+      </conditions>
+      <actions>
+        <set_value name="$id"    exact="event.param.$id"/>
+        <set_value name="$value" exact="event.param.$value"/>
+        
+        <raise_lua_event
+          name="'Simple_Menu_Options.'+$id"
+          param="$value"/>
+
+        <!--If the game_loaded trigger is set, and this is the autopause option,
+        and its value is true, then signal lua to pause the game.-->
+        <do_if value="($id == 'autopause_on_load') and $value and Globals.$load_trigger">
+          <!--Clear the trigger for later reloadui commands.-->
+          <set_value name="Globals.$load_trigger" exact="false"/>
+          <raise_lua_event name="'Simple_Menu_Options.Pause_Game'"/>
+        </do_if>
+
+        <!--<raise_lua_event
+          name="'Simple_Menu_Options.Set_Field'"
+          param="event.param.$id"/>
+        <raise_lua_event
+          name="'Simple_Menu_Options.Set_Value'"
+          param="event.param.$value"/>-->
+      </actions>
+    </cue>    
+
+  </cues>
+
+</mdscript>

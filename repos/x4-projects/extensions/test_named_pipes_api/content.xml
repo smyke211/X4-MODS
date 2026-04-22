@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content 
+  id="named_pipes_api_test" 
+  name="Named Pipes API Test" 
+  author="SirNukes" 
+  version="006" 
+  date="2019-07-23" 
+  save="false" 
+  sync="false" 
+  enabled="false">
+
+  <!--Mod support APIs-->
+  <dependency id="ws_2042901274" version="100" optional="false"/>
+</content>

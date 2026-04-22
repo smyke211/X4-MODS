@@ -1,0 +1,279 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>f6c389ca-f38e-4609-9962-215729e29106</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>sn_remove_dirty_glass\Customizer_Script.py</StartupFile>
+    <SearchPath>..\..\X4_Customizer</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>extensions</Name>
+    <RootNamespace>extensions</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="sn_sector_travel_rebalance\" />
+    <Folder Include="sn_measure_fps\" />
+    <Folder Include="sn_measure_fps\ui\" />
+    <Folder Include="sn_measure_fps\md\" />
+    <Folder Include="sn_measure_fps\python\" />
+    <Folder Include="sn_mod_support_apis\ui\userdata\" />
+    <Folder Include="test_chat_window\" />
+    <Folder Include="sn_mod_support_apis\ui\chat_window\" />
+    <Folder Include="sn_test_misc\" />
+    <Folder Include="sn_asteroid_fade\" />
+    <Folder Include="sn_reduce_fog\" />
+    <Folder Include="sn_script_profiler\" />
+    <Folder Include="sn_debug_info\" />
+    <Folder Include="sn_debug_info\md\" />
+    <Folder Include="sn_hotkey_collection\ui\" />
+    <Folder Include="sn_remove_highway_blobs\" />
+    <Folder Include="sn_script_profiler\ui\" />
+    <Folder Include="sn_script_profiler\md\" />
+    <Folder Include="sn_script_profiler\python\" />
+    <Folder Include="sn_test_misc\md\" />
+    <Folder Include="sn_measure_perf\" />
+    <Folder Include="sn_measure_perf\md\" />
+    <Folder Include="sn_measure_perf\ui\" />
+    <Folder Include="sn_start_with_seta\" />
+    <Folder Include="sn_quiet_target_range_clicks\" />
+    <Folder Include="sn_quiet_target_range_clicks\libraries\" />
+    <Folder Include="sn_remove_blinking_lights\" />
+    <Folder Include="sn_remove_dirty_glass\" />
+    <Folder Include="sn_remove_dock_glow\" />
+    <Folder Include="sn_friendlier_fire\" />
+    <Folder Include="sn_better_target_monitor\t\" />
+    <Folder Include="sn_extra_game_options\t\" />
+    <Folder Include="sn_friendlier_fire\md\" />
+    <Folder Include="sn_hotkey_collection\t\" />
+    <Folder Include="sn_interact_collection\t\" />
+    <Folder Include="sn_mod_support_apis\t\" />
+    <Folder Include="sn_start_with_seta\md\" />
+    <Folder Include="sn_station_kill_helper\" />
+    <Folder Include="sn_station_kill_helper\md\" />
+    <Folder Include="sn_remove_dock_symbol\" />
+    <Folder Include="sn_interact_collection\" />
+    <Folder Include="sn_hotkey_collection\" />
+    <Folder Include="sn_interact_collection\md\" />
+    <Folder Include="sn_mod_support_apis\" />
+    <Folder Include="sn_better_target_monitor\" />
+    <Folder Include="sn_better_target_monitor\ui\" />
+    <Folder Include="sn_better_target_monitor\md\" />
+    <Folder Include="test_chat_window\md\" />
+    <Folder Include="test_hotkey_api\" />
+    <Folder Include="test_hotkey_api\md\" />
+    <Folder Include="test_interact_menu_api\" />
+    <Folder Include="test_interact_menu_api\md\" />
+    <Folder Include="sn_mod_support_apis\old_change_logs\" />
+    <Folder Include="sn_mod_support_apis\python\" />
+    <Folder Include="test_named_pipes_api\" />
+    <Folder Include="test_named_pipes_api\md\" />
+    <Folder Include="sn_extra_game_options\" />
+    <Folder Include="sn_hotkey_collection\md\" />
+    <Folder Include="test_simple_menu_api\" />
+    <Folder Include="test_simple_menu_api\md\" />
+    <Folder Include="sn_extra_game_options\ui\" />
+    <Folder Include="sn_extra_game_options\md\" />
+    <Folder Include="sn_mod_support_apis\ui\named_pipes\" />
+    <Folder Include="sn_mod_support_apis\ui\hotkey\" />
+    <Folder Include="sn_mod_support_apis\ui\interact_menu\" />
+    <Folder Include="sn_mod_support_apis\ui\time\" />
+    <Folder Include="sn_mod_support_apis\ui\simple_menu\" />
+    <Folder Include="sn_mod_support_apis\md\" />
+    <Folder Include="sn_mod_support_apis\ui\c_library\" />
+    <Folder Include="sn_mod_support_apis\documentation\" />
+    <Folder Include="sn_mod_support_apis\ui\" />
+    <Folder Include="test_time_api\" />
+    <Folder Include="test_time_api\md\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sn_asteroid_fade\.gitignore" />
+    <Content Include="sn_asteroid_fade\change_log.md" />
+    <Content Include="sn_asteroid_fade\content.xml" />
+    <Content Include="sn_better_target_monitor\change_log.md" />
+    <Content Include="sn_better_target_monitor\content.xml" />
+    <Content Include="sn_better_target_monitor\ui.xml" />
+    <Content Include="sn_better_target_monitor\ui\target_monitor.lua" />
+    <Content Include="sn_better_target_monitor\md\better_target_monitor.xml" />
+    <Content Include="sn_better_target_monitor\Readme.md" />
+    <Content Include="sn_better_target_monitor\t\0001-L007.xml" />
+    <Content Include="sn_better_target_monitor\t\0001-L033.xml" />
+    <Content Include="sn_better_target_monitor\t\0001-L049.xml" />
+    <Content Include="sn_better_target_monitor\t\0001-L081.xml" />
+    <Content Include="sn_better_target_monitor\t\0001.xml" />
+    <Content Include="sn_extra_game_options\ui.xml" />
+    <Content Include="sn_hotkey_collection\ui.xml" />
+    <Content Include="sn_measure_fps\ui.xml" />
+    <Content Include="sn_measure_perf\ui.xml" />
+    <Content Include="sn_mod_support_apis\documentation\Lua_Loader_API.md" />
+    <Content Include="sn_mod_support_apis\documentation\Userdata_API.md" />
+    <Content Include="sn_script_profiler\ui.xml" />
+    <Content Include="sn_sector_travel_rebalance\.gitignore" />
+    <Content Include="sn_sector_travel_rebalance\content.xml" />
+    <Content Include="sn_debug_info\change_log.md" />
+    <Content Include="sn_debug_info\content.xml" />
+    <Content Include="sn_debug_info\md\sn_debug_info.xml" />
+    <Content Include="sn_extra_game_options\t\0001-l033.xml" />
+    <Content Include="sn_extra_game_options\t\0001-l049.xml" />
+    <Content Include="sn_extra_game_options\t\0001.xml" />
+    <Content Include="sn_friendlier_fire\change_log.md" />
+    <Content Include="sn_friendlier_fire\content.xml" />
+    <Content Include="sn_friendlier_fire\md\sn_friendlier_fire.xml" />
+    <Content Include="sn_hotkey_collection\ui\hotkeys.lua" />
+    <Content Include="sn_hotkey_collection\readme.md" />
+    <Content Include="sn_hotkey_collection\t\0001-l049.xml" />
+    <Content Include="sn_hotkey_collection\t\0001-l081.xml" />
+    <Content Include="sn_hotkey_collection\t\0001.xml" />
+    <Content Include="sn_interact_collection\t\0001.xml" />
+    <Content Include="sn_measure_fps\content.xml" />
+    <Content Include="sn_measure_fps\ui\measure_fps.lua" />
+    <Content Include="sn_measure_fps\md\sn_measure_fps.xml" />
+    <Content Include="sn_measure_perf\.gitignore" />
+    <Content Include="sn_measure_perf\ui\Measure_Perf.lua" />
+    <Content Include="sn_mod_support_apis\change_log.md" />
+    <Content Include="sn_mod_support_apis\documentation\Chat_Window_API.md" />
+    <Content Include="sn_mod_support_apis\documentation\Interact_Menu_API.md" />
+    <Content Include="sn_mod_support_apis\documentation\Simple_Menu_Options_API.md" />
+    <Content Include="sn_mod_support_apis\documentation\Time_API.md" />
+    <Content Include="sn_mod_support_apis\ui\chat_window\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\text.lua" />
+    <Content Include="sn_mod_support_apis\ui\userdata\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\external_interface.lua" />
+    <Content Include="sn_mod_support_apis\md\chat_window_api.xml" />
+    <Content Include="sn_mod_support_apis\md\userdata.xml" />
+    <Content Include="sn_mod_support_apis\old_change_logs\interact_menu_api.md" />
+    <Content Include="sn_mod_support_apis\old_change_logs\lua_loader_api.md" />
+    <Content Include="sn_mod_support_apis\old_change_logs\named_pipes_api.md" />
+    <Content Include="sn_mod_support_apis\old_change_logs\simple_menu_api.md" />
+    <Content Include="sn_mod_support_apis\old_change_logs\time_api.md" />
+    <Content Include="sn_mod_support_apis\t\0001-l049.xml" />
+    <Content Include="sn_mod_support_apis\t\0001-l081.xml" />
+    <Content Include="sn_mod_support_apis\t\0001.xml" />
+    <Content Include="sn_quiet_target_range_clicks\change_log.md" />
+    <Content Include="sn_quiet_target_range_clicks\content.xml" />
+    <Content Include="sn_quiet_target_range_clicks\libraries\sound_library.xml" />
+    <Content Include="sn_reduce_fog\.gitignore" />
+    <Content Include="sn_reduce_fog\change_log.md" />
+    <Content Include="sn_reduce_fog\content.xml" />
+    <Content Include="sn_remove_blinking_lights\.gitignore" />
+    <Content Include="sn_remove_blinking_lights\change_log.md" />
+    <Content Include="sn_remove_blinking_lights\content.xml" />
+    <Content Include="sn_remove_dirty_glass\.gitignore" />
+    <Content Include="sn_remove_dirty_glass\change_log.md" />
+    <Content Include="sn_remove_dirty_glass\content.xml" />
+    <Content Include="sn_remove_dock_glow\.gitignore" />
+    <Content Include="sn_remove_dock_glow\change_log.md" />
+    <Content Include="sn_remove_dock_glow\content.xml" />
+    <Content Include="sn_remove_dock_symbol\.gitignore" />
+    <Content Include="sn_remove_dock_symbol\change_log.md" />
+    <Content Include="sn_remove_highway_blobs\.gitignore" />
+    <Content Include="sn_remove_highway_blobs\content.xml" />
+    <Content Include="sn_script_profiler\.gitignore" />
+    <Content Include="sn_script_profiler\config.ini" />
+    <Content Include="sn_script_profiler\content.xml" />
+    <Content Include="sn_script_profiler\ui\script_profiler.lua" />
+    <Content Include="sn_script_profiler\md\sn_script_profiler.xml" />
+    <Content Include="sn_script_profiler\config_defaults.ini" />
+    <Content Include="sn_script_profiler\readme.md" />
+    <Content Include="sn_start_with_seta\change_log.md" />
+    <Content Include="sn_start_with_seta\content.xml" />
+    <Content Include="sn_start_with_seta\md\sn_start_with_seta.xml" />
+    <Content Include="sn_station_kill_helper\change_log.md" />
+    <Content Include="sn_station_kill_helper\content.xml" />
+    <Content Include="sn_station_kill_helper\md\sn_station_kill_helper.xml" />
+    <Content Include="sn_interact_collection\change_log.md" />
+    <Content Include="sn_interact_collection\content.xml" />
+    <Content Include="sn_interact_collection\md\sn_interact_commands.xml" />
+    <Content Include="sn_mod_support_apis\ui\library.lua" />
+    <Content Include="sn_remove_dock_symbol\content.xml" />
+    <Content Include="sn_measure_perf\content.xml" />
+    <Content Include="sn_measure_perf\md\sn_measure_perf.xml" />
+    <Content Include="sn_test_misc\content.xml" />
+    <Content Include="sn_test_misc\md\sn_test_hotkeys.xml" />
+    <Content Include="test_chat_window\content.xml" />
+    <Content Include="test_chat_window\md\chat_window_test.xml" />
+    <Content Include="test_hotkey_api\content.xml" />
+    <Content Include="test_hotkey_api\md\hotkey_api_test.xml" />
+    <Content Include="test_interact_menu_api\content.xml" />
+    <Content Include="test_interact_menu_api\md\interact_menu_api_test.xml" />
+    <Content Include="link_to_extensions.bat" />
+    <Content Include="test_named_pipes_api\content.xml" />
+    <Content Include="test_named_pipes_api\md\test_named_pipe.xml" />
+    <Content Include="sn_hotkey_collection\change_log.md" />
+    <Content Include="sn_hotkey_collection\content.xml" />
+    <Content Include="sn_extra_game_options\ui\custom_options.lua" />
+    <Content Include="test_simple_menu_api\content.xml" />
+    <Content Include="test_simple_menu_api\md\simple_menu_api_test.xml" />
+    <Content Include="sn_extra_game_options\change_log.md" />
+    <Content Include="sn_extra_game_options\content.xml" />
+    <Content Include="sn_extra_game_options\md\extra_game_options.xml" />
+    <Content Include="sn_extra_game_options\Readme.md" />
+    <Content Include="sn_mod_support_apis\Readme.md"/>
+    <Content Include="sn_mod_support_apis\ui\time\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\time\pipe_time.lua" />
+    <Content Include="sn_mod_support_apis\md\time_api.xml" />
+    <Content Include="sn_mod_support_apis\documentation\simple_menu_api.md" />
+    <Content Include="sn_mod_support_apis\ui\simple_menu\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\simple_menu\library.lua" />
+    <Content Include="sn_mod_support_apis\ui\simple_menu\options_menu.lua" />
+    <Content Include="sn_mod_support_apis\ui\simple_menu\standalone_menu.lua" />
+    <Content Include="sn_mod_support_apis\ui\simple_menu\tables.lua" />
+    <Content Include="sn_mod_support_apis\old_change_logs\hotkey_api.md" />
+    <Content Include="sn_mod_support_apis\ui\hotkey\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\interact_menu\interface.lua" />
+    <Content Include="sn_hotkey_collection\md\sn_hotkeys.xml" />
+    <Content Include="sn_mod_support_apis\md\hotkey_api.xml" />
+    <Content Include="sn_mod_support_apis\md\interact_menu_api.xml" />
+    <Content Include="sn_mod_support_apis\md\lua_loader.xml" />
+    <Content Include="sn_mod_support_apis\md\simple_menu_api.xml" />
+    <Content Include="sn_mod_support_apis\md\simple_menu_options.xml" />
+    <Content Include="sn_mod_support_apis\documentation\hotkey_api.md" />
+    <Content Include="sn_mod_support_apis\ui\c_library\winpipe.lua" />
+    <Content Include="sn_mod_support_apis\ui\named_pipes\interface.lua" />
+    <Content Include="sn_mod_support_apis\ui\named_pipes\pipes.lua" />
+    <Content Include="sn_mod_support_apis\ui\named_pipes\library.lua" />
+    <Content Include="sn_mod_support_apis\md\named_pipes.xml" />
+    <Content Include="sn_mod_support_apis\md\pipe_server_host.xml" />
+    <Content Include="sn_mod_support_apis\md\pipe_server_lib.xml" />
+    <Content Include="sn_mod_support_apis\documentation\named_pipes_api.md" />
+    <Content Include="sn_mod_support_apis\content.xml" />
+    <Content Include="sn_mod_support_apis\ui\lua_loader.lua" />
+    <Content Include="sn_mod_support_apis\ui.xml" />
+    <Content Include="test_time_api\content.xml" />
+    <Content Include="test_time_api\md\time_api_test.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="sn_asteroid_fade\Customizer_Script.py" />
+    <Compile Include="sn_measure_fps\python\Measure_FPS.py" />
+    <Compile Include="sn_mod_support_apis\python\Send_Keys.py" />
+    <Compile Include="sn_mod_support_apis\python\Time_API.py" />
+    <Compile Include="sn_reduce_fog\Customizer_Script.py" />
+    <Compile Include="sn_remove_blinking_lights\Customizer_Script.py" />
+    <Compile Include="sn_remove_dirty_glass\Customizer_Script.py" />
+    <Compile Include="sn_remove_dock_glow\Customizer_Script.py" />
+    <Compile Include="sn_measure_perf\Customizer_Script.py" />
+    <Compile Include="sn_remove_dock_symbol\Customizer_Script.py" />
+    <Compile Include="sn_remove_highway_blobs\Customizer_Script.py" />
+    <Compile Include="sn_script_profiler\Modfy_Exe.py"/>
+    <Compile Include="sn_script_profiler\Modify_Scripts.py" />
+    <Compile Include="sn_script_profiler\python\Script_Profiler.py" />
+    <Compile Include="sn_sector_travel_rebalance\Customizer_Script.py"/>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

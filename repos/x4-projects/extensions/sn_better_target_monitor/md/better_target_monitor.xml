@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mdscript name="SN_Better_Target_Monitor" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+  <!--
+  MD side of the target monitor customization.
+  Handles player options; all actual monitor logic is in lua.
+  
+  Note: depends on the Simple_Menu_API to display options.
+  (For now, a hard dependency.)
+  -->
+
+  <cues>
+
+    <!--
+      Text storage cue, for easier lookup in general.
+      Members are descriptive names of the text strings, prefixed with $.
+    -->
+    <cue name="Text"/>
+    <library name="Load_Text">
+      <actions>
+        <set_value exact="{68537, 3000}" name="Text.$Better_Target_Monitor" />
+        <set_value exact="{68537, 3001}" name="Text.$tm_enable_name" />
+        <set_value exact="{68537, 3002}" name="Text.$tm_enable_mouseover" />
+        <set_value exact="{68537, 3003}" name="Text.$tm_layout_name" />
+        <set_value exact="{68537, 3004}" name="Text.$tm_layout_mouseover" />
+        <set_value exact="{68537, 3005}" name="Text.$tm_hull_shield_bold_name" />
+        <set_value exact="{68537, 3006}" name="Text.$tm_hull_shield_bold_mouseover" />
+        <set_value exact="{68537, 3007}" name="Text.$tm_hull_shield_colors_name" />
+        <set_value exact="{68537, 3008}" name="Text.$tm_hull_shield_colors_mouseover" />
+        <set_value exact="{68537, 3009}" name="Text.$tm_faction_color_name" />
+        <set_value exact="{68537, 3010}" name="Text.$tm_faction_color_mouseover" />
+        <set_value exact="{68537, 3011}" name="Text.$tm_brighten_text_name" />
+        <set_value exact="{68537, 3012}" name="Text.$tm_brighten_text_mouseover" />
+        <set_value exact="{68537, 3013}" name="Text.$tm_show_x3_class_name" />
+        <set_value exact="{68537, 3014}" name="Text.$tm_show_x3_class_mouseover" />
+      </actions>
+    </library>
+
+
+    <!-- Listen from the menu api reloading. -->
+    <cue name="Reset_OnReload" instantiate="true">
+      <conditions>
+        <event_cue_signalled cue="md.Simple_Menu_Options.Reloaded"/>
+      </conditions>
+      <actions>
+        
+        <!--Load any text.-->
+        <include_actions ref="Load_Text"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_enable',
+            $name       = Text.$tm_enable_name,
+            $mouseover  = Text.$tm_enable_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'enabled',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_layout',
+            $name       = Text.$tm_layout_name,
+            $mouseover  = Text.$tm_layout_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'layout',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_hull_shield_bold',
+            $name       = Text.$tm_hull_shield_bold_name,
+            $mouseover  = Text.$tm_hull_shield_bold_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'hull_shield_bold',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_hull_shield_colors',
+            $name       = Text.$tm_hull_shield_colors_name,
+            $mouseover  = Text.$tm_hull_shield_colors_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'hull_shield_colors',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_faction_color',
+            $name       = Text.$tm_faction_color_name,
+            $mouseover  = Text.$tm_faction_color_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'faction_color',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_brighten_text',
+            $name       = Text.$tm_brighten_text_name,
+            $mouseover  = Text.$tm_brighten_text_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'brighten_text',
+            ]"/>
+
+        <signal_cue_instantly
+          cue = "md.Simple_Menu_Options.Register_Option"
+          param = "table[
+            $category   = Text.$Better_Target_Monitor,
+            $id         = 'tm_show_x3_class',
+            $name       = Text.$tm_show_x3_class_name,
+            $mouseover  = Text.$tm_show_x3_class_mouseover,
+            $type       = 'button',
+            $default    = 1,
+            $callback   = OnChange,
+            $echo       = 'show_x3_class',
+            ]"/>
+
+      </actions>
+    </cue>
+
+    <cue name="OnChange" instantiate="true">
+      <conditions>
+        <event_cue_signalled />
+      </conditions>
+      <actions>
+        <!--
+        Need to send name and value back to lua.
+        Could use an actor blackboard (messy), encode into a string
+        and parse in lua (also messy), append field to the signal name
+        and have lua listen to all possible fields, or just send two signals
+        and have lua piece them back together.
+        
+        The latter approach probably makes for the most scalable option
+        while still being relatively simple.
+        -->
+        <raise_lua_event
+          name="'Target_Monitor.Set_Field'"
+          param="event.param.$echo"/>
+        <raise_lua_event
+          name="'Target_Monitor.Set_Value'"
+          param="event.param.$value"/>
+      </actions>
+    </cue>
+    
+
+  </cues>
+
+</mdscript>
