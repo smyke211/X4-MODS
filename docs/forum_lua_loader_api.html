@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Lua Loader API - Forum Thread</title></head>
+<body>
+<h1>Lua Loader API</h1>
+<p>Author: SirNukes | Date: Mon, 12. Aug 19</p>
+
+<h2>Overview</h2>
+<p>Implements a generic method of loading custom lua files into X4, working around a bug in the intended method of loading lua code.</p>
+
+<h2>How to Use</h2>
+<p>In an MD script, add a cue following this template:</p>
+<pre>
+&lt;cue name="Load_Lua_Files" instantiate="true"&gt;
+  &lt;conditions&gt;
+    &lt;event_ui_triggered screen="'Lua_Loader'" control="'Ready'" /&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;raise_lua_event name="'Lua_Loader.Load'" 
+      param="'extensions.your_ext_name.your_lua_file_name'"/&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+</pre>
+
+<h2>Requirements</h2>
+<ul>
+<li>Replace "your_ext_name.your_lua_file_name" with appropriate path (no extension)</li>
+<li>Lua file must be loose (not packed in cat/dat)</li>
+<li>Extension can be ".lua" or ".txt" (txt may be needed for Steam Workshop)</li>
+<li>Reload in-game with "/reloadui" in chat window</li>
+</ul>
+
+<h2>Dependency Loading</h2>
+<p>When loading completes, a message is printed to debuglog and a ui signal is raised.</p>
+<p>Signal "control" field will be "Loaded " followed by the original param file path.</p>
+<p>This can be used to set up loading dependencies:</p>
+<pre>
+&lt;conditions&gt;
+  &lt;event_ui_triggered screen="'Lua_Loader'" 
+    control="'Loaded extensions.other_ext_name.other_lua_file_name'" /&gt;
+&lt;/conditions&gt;
+</pre>
+
+<h2>How It Works</h2>
+<p>A small lua program provides two functions:</p>
+<ol>
+<li>Signal when it is loaded</li>
+<li>Receive file paths from MD scripts and load them using lua's "require"</li>
+</ol>
+
+<h2>The Problem It Solves</h2>
+<p>Standard ui.xml lua loading has issues:</p>
+<ul>
+<li>Globals table is not initialized</li>
+<li>No access to UI functions exported by other X4 lua files</li>
+<li>No FFI support</li>
+<li>No way to communicate with Mission Director</li>
+<li>Basic lua functions unavailable</li>
+</ul>
+
+<p>Prior workaround by morbideth was complex; this API provides simpler MIT-licensed solution.</p>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=418254">Original thread</a></p>
+</body>
+</html>

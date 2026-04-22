@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Getting Started - Forum Thread</title></head>
+<body>
+<h1>Getting Started: Tools, Scripting and Modding</h1>
+<p>Author: euclid (Moderator) | Date: Fri, 30. Nov 18</p>
+
+<h2>Unpacking Game Files</h2>
+<p>Use <strong>XRCatTool</strong> from X Rebirth (works for X4).</p>
+<p>Download and place in X4 root directory (where X4.exe is).</p>
+
+<h3>Example unpack.bat</h3>
+<pre>
+E:
+cd "Games\Steam\SteamApps\common\X4 Foundations"
+XRCatTool.exe -in 01.cat -in 02.cat -in 03.cat -in 04.cat -in 05.cat -in 06.cat -in 07.cat -in 08.cat -in 09.cat -out "E:\Games\Steam\SteamApps\common\X4 Foundations\unpacked"
+pause
+</pre>
+
+<h2>Useful Tools</h2>
+<ul>
+<li><strong>AstroGrep</strong> — find entries in game files</li>
+<li><strong>Notepad++</strong> or <strong>Visual Studio Express</strong> — XML editing</li>
+</ul>
+
+<h2>Mission Director (MD) and XML Script Commands</h2>
+<p>After unpacking, find <code>.xsd</code> files in folders:</p>
+<ul>
+<li><code>libraries/</code></li>
+<li><code>md/</code></li>
+<li><code>scripts/</code></li>
+</ul>
+
+<p>Also check <code>scriptproperties.html</code> in unpacked folder root — contains all expressions defined in XSD files.</p>
+
+<h2>Activate Mods</h2>
+<ol>
+<li>Create <code>extensions/</code> folder in X4 root</li>
+<li>If root doesn't work, try X4 document folder instead</li>
+<li>Create mod folder inside extensions</li>
+<li>Create <code>content.xml</code> with metadata</li>
+<li>Create <code>md/</code> or <code>aiscripts/</code> folders for scripts</li>
+</ol>
+
+<h3>Example content.xml</h3>
+<pre>
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;content id="PJ" name="PlayerJump" 
+  description="Player Ship can Jump to a Target via Autopilot"
+  author="Euclid" version="0.1" date="2018-15-09" save="0" enabled="1"&gt;
+  &lt;text language="44" name="PlayerJump" 
+    description="Player ship can jump via autopilot to a selected target"
+    author="Euclid" /&gt;
+&lt;/content&gt;
+</pre>
+
+<h2>Tips</h2>
+<ul>
+<li>Backup your saved games before testing mods</li>
+<li>Use debuglog to check extension loading</li>
+<li>Check in-game "extensions" settings to confirm mod is active</li>
+</ul>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=402452">Original thread</a></p>
+</body>
+</html>

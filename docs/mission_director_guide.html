@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mission Director Guide - X4/XR Wiki</title>
+</head>
+<body>
+<h1>Mission Director Guide</h1>
+<p>Last modified by Klaus Meyer on 2025/03/31 16:39</p>
+
+<h2>Introduction</h2>
+<p>The Mission Director (MD) is a subsystem of the game and interprets mission scripts, which are written in an XML-based language. The Mission Director in X Rebirth and X4 is based on the MD in X3: Terran Conflict, with some major changes based on feedback from MD users.</p>
+
+<p><strong>Note:</strong> The general MD scripting system is the same in XR and X4, so this guide applies to both games. However, each game has its own set of supported script features (actions, conditions and properties).</p>
+
+<h2>Key Concepts</h2>
+
+<h3>MD Scripts</h3>
+<p>MD scripts are not necessarily missions. An MD file can contain a part of a mission, multiple missions, or no mission at all, as the MD is used for more than just missions.</p>
+
+<p>MD files are XML files located in the game folder <code>md/</code>. All XML files in that folder are loaded at game start. File names are irrelevant, as script names are read from XML root nodes.</p>
+
+<h3>Script Structure</h3>
+<ul>
+<li><strong>Cues</strong> - Basic execution units</li>
+<li><strong>Conditions</strong> - Event conditions and non-event conditions</li>
+<li><strong>Actions</strong> - Operations performed when cues trigger</li>
+<li><strong>Libraries</strong> - Reusable script components</li>
+</ul>
+
+<h3>Debug Output</h3>
+<p>To collect debug messages, start game with:</p>
+<pre>-logfile debuglog.txt -debug scripts</pre>
+
+<p>The script action <code>&lt;debug_text&gt;</code> can print messages from within scripts.</p>
+
+<h2>Full Documentation</h2>
+<p>See <code>XRMissionDirectorGuide.pdf</code> in this folder for complete guide.</p>
+
+<p>Source: <a href="https://wiki.egosoft.com/X%20Rebirth%20Wiki/Modding%20support/Mission%20Director%20Guide/">https://wiki.egosoft.com/X%20Rebirth%20Wiki/Modding%20support/Mission%20Director%20Guide/</a></p>
+</body>
+</html>

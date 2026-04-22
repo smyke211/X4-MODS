@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Interact Menu API - Forum Thread</title></head>
+<body>
+<h1>[API] Interact Menu API</h1>
+<p>Author: SirNukes | Date: Mon, 18. May 20</p>
+
+<h2>Overview</h2>
+<p>Implements a generic mission-director level api for adding custom interact menu actions (right-click menu).</p>
+<p>A lua backend interfaces with the egosoft menu code; api users may work purely with mission director scripts.</p>
+
+<h2>How It Works</h2>
+<ol>
+<li>When menu opens, info is gathered from lua and passed to <code>md.Interact_Menu_API.Get_Actions</code> cue</li>
+<li>Users listen to this cue, check menu parameters</li>
+<li>On wanted conditions, add action using <code>Add_Action</code></li>
+<li>Callback cue is defined for when player selects the action</li>
+</ol>
+
+<h2>Full Documentation</h2>
+<p>GitHub: <a href="https://github.com/bvbohnen/x4-projects">x4-projects</a></p>
+<p>Download: <a href="https://github.com/bvbohnen/x4-projects/releases">releases</a></p>
+
+<h2>Example — Follow Autopilot Action</h2>
+<pre>
+&lt;cue name="Add_Interact_Actions" instantiate="true"&gt;
+  &lt;conditions&gt;
+    &lt;event_cue_signalled cue="md.Interact_Menu_API.Get_Actions" /&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;set_value name="$target" exact="event.param.$object"/&gt;
+    &lt;do_if value="event.param.$showPlayerInteractions and $target.isclass.{class.destructible}"&gt;
+      &lt;signal_cue_instantly cue="md.Interact_Menu_API.Add_Action" 
+        param="table[
+          $id = 'target_follow',
+          $section = 'interaction',
+          $text = 'Follow',
+          $mouseover = '%s %s'.[Text.$Follow, $target.name],
+          $icon = 'order_follow',
+          $mouseover_icon = 'order_follow',
+          $callback = Target_Follow,
+        ]"/&gt;
+    &lt;/do_if&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+
+&lt;cue name="Target_Follow" instantiate="true" namespace="this"&gt;
+  &lt;conditions&gt;
+    &lt;event_cue_signalled/&gt;
+    &lt;check_value value="player.occupiedship"/&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;start_player_autopilot destination="event.param.$object"/&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+</pre>
+
+<h2>Action Fields</h2>
+<ul>
+<li><code>$id</code> — unique identifier</li>
+<li><code>$section</code> — menu section</li>
+<li><code>$text</code> — display text</li>
+<li><code>$mouseover</code> — tooltip text</li>
+<li><code>$icon</code> — icon name</li>
+<li><code>$mouseover_icon</code> — tooltip icon</li>
+<li><code>$callback</code> — callback cue name</li>
+</ul>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=427451">Original thread</a></p>
+</body>
+</html>

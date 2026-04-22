@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Named Pipes API - Forum Thread</title></head>
+<body>
+<h1>[MOD/API] Named Pipes API</h1>
+<p>Author: SirNukes | Date: Mon, 25. Nov 19</p>
+
+<h2>Overview</h2>
+<p>Adds support for Windows named pipes for inter-process communication. Named pipes are OS level pseudo-files which support inter-process communication.</p>
+<p>Pipes avoid the overhead of disk access from normal files (eg. debug logs), and are <strong>bidirectional</strong>.</p>
+<p><strong>Architecture:</strong> X4 acts as a client, with one or more external applications serving the pipes.</p>
+
+<h2>Components</h2>
+<ul>
+<li><strong>Low level lua plugin + DLL</strong> — for pipe access</li>
+<li><strong>MD wrapper</strong> — interfaces between lua and MD pipe users</li>
+<li><strong>Optional Python external pipe host server</strong> — default server implementation</li>
+</ul>
+
+<h2>Requirements</h2>
+<ul>
+<li>Lua Loader API extension</li>
+<li>Time API extension</li>
+<li>Optionally: Simple Menu API</li>
+<li>Python 3.6+ with pywin32 (if running from source) OR use prebuilt executable</li>
+</ul>
+
+<h2>Installation</h2>
+<ol>
+<li>Place the named_pipes_api folder in extensions</li>
+<li>Place the X4_Python_Pipe_Server (exe or py) anywhere convenient</li>
+<li>Run pipe server alongside X4</li>
+</ol>
+
+<h2>API Layers</h2>
+<ul>
+<li><strong>MD Pipe API</strong> — Named_Pipes.xml, allows MD code to read/write pipes</li>
+<li><strong>MD Server API</strong> — Pipe_Server_Host, allows MD to register Python modules with host server</li>
+<li><strong>Lua Pipe API</strong> — Named_Pipes.lua, lower level support</li>
+<li><strong>Winpipe DLL API</strong> — wraps Windows pipe functions (open, read, write, close, error check)</li>
+</ul>
+
+<h2>Key Features</h2>
+<ul>
+<li>Asynchronous callback-based model</li>
+<li>Results delivered to callback cues</li>
+<li>Timeout behavior configurable (default: disabled in v1.1+)</li>
+<li>Option to flush pending accesses on timeout</li>
+</ul>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=420406">Original thread</a></p>
+</body>
+</html>

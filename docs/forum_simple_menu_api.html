@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Simple Menu API - Forum Thread</title></head>
+<body>
+<h1>[MOD/API] Simple Menu API</h1>
+<p>Author: SirNukes | Date: Thu, 14. Nov 19</p>
+
+<h2>Overview</h2>
+<p>Adds support for generating menus using mission director scripts in X4.</p>
+<p>A lua backend handles the details of interfacing with the x4 ui system.</p>
+
+<h2>Two Types of Menus</h2>
+<ul>
+<li><strong>Options menus</strong> — integrated with standard x4 options</li>
+<li><strong>Standalone menus</strong> — display immediately</li>
+</ul>
+
+<h2>Requirements</h2>
+<ul>
+<li>Lua Loader API extension</li>
+</ul>
+
+<h2>Usage Patterns</h2>
+
+<h3>1. Basic Extension Options</h3>
+<p>Call <code>Register_Option</code> with:</p>
+<ul>
+<li>name</li>
+<li>default value</li>
+<li>widget type</li>
+<li>callback (receives new value on change)</li>
+</ul>
+
+<h3>2. Standalone Menu</h3>
+<ul>
+<li>Call <code>Create_Menu</code> to open new menu (closes others)</li>
+<li>Fill with rows and widgets</li>
+<li>Specify callback cues</li>
+<li>Callbacks signalled on player input</li>
+</ul>
+
+<h3>3. Options Menu</h3>
+<ul>
+<li>Call <code>Register_Options_Menu</code> to register with backend</li>
+<li>Create cue to make rows and widgets</li>
+<li>Set cue as onOpen callback target</li>
+<li>Access through "Extension Options" page</li>
+</ul>
+
+<h2>Supported Widgets</h2>
+<p>From community note (teleportationwars):</p>
+<ul>
+<li>Icons, scaling, resizing, colors</li>
+<li>Edit boxes, dropdowns, buttons</li>
+<li>Partial redrawing, scrolling, fonts</li>
+<li>Sliders, checkboxes</li>
+</ul>
+
+<h2>Example — Simple Option</h2>
+<pre>
+&lt;cue name="Reset_On_Reload" instantiate="true"&gt;
+  &lt;conditions&gt;
+    &lt;event_cue_signalled cue="md.Simple_Menu_Options.Reloaded"/&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;signal_cue_instantly cue="md.Simple_Menu_Options.Register_Option" 
+      param="table[
+        $id = 'debug_menu_api',
+        $name = 'Enable menu api debug logs',
+        $mouseover = 'Prints extra api status info to the debug log',
+        $default = 0,
+        $type = 'button',
+        $callback = OnChange,
+      ]"/&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+</pre>
+
+<h2>Example — Standalone Menu</h2>
+<pre>
+&lt;cue name="Open_Menu" instantiate="true" namespace="this"&gt;
+  &lt;conditions&gt;
+    &lt;event_cue_signalled/&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;signal_cue_instantly cue="md.Simple_Menu_API.Create_Menu" 
+      param="table[$columns = 1, $title = 'My Menu', $width = 500,]"/&gt;
+    &lt;signal_cue_instantly cue="md.Simple_Menu_API.Add_Row"/&gt;
+    &lt;signal_cue_instantly cue="md.Simple_Menu_API.Make_Label" 
+      param="table[$col=1, $text='Hello world']"/&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+</pre>
+
+<h2>Key Functions</h2>
+<ul>
+<li><code>Register_Option</code></li>
+<li><code>Create_Menu</code></li>
+<li><code>Add_Row</code></li>
+<li><code>Make_Text</code></li>
+<li><code>Make_Label</code></li>
+<li><code>Register_Options_Menu</code></li>
+</ul>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=419923">Original thread</a></p>
+</body>
+</html>

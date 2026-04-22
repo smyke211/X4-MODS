@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Hotkey API - Forum Thread</title></head>
+<body>
+<h1>[MOD/API] Hotkey API</h1>
+<p>Author: SirNukes | Date: Mon, 25. Nov 19</p>
+
+<h2>Overview</h2>
+<p>Adds support for capturing key presses in X4, to implement custom hotkeys.</p>
+<p>An external Python server is used for the key capture and combo recognition, and interfaces with X4 using named pipes.</p>
+
+<h2>Requirements</h2>
+<ul>
+<li>Named Pipes API (server should be running)</li>
+<li>pywin32 and pynput packages (if using Python pipe server, not needed for prebuilt executable)</li>
+</ul>
+
+<h2>Usage — Register Action</h2>
+<pre>
+&lt;signal_cue_instantly cue="md.Hotkey_API.Register_Action" 
+  param="table[
+    $id = 'kc_target_follow',
+    $cue = Target_Follow,
+    $name = 'Follow Target',
+    $description = 'Turns on autopilot to follow the target'
+  ]"/&gt;
+</pre>
+
+<h2>Usage — Direct Key Mapping</h2>
+<pre>
+&lt;cue name="Register_Keys" instantiate="true"&gt;
+  &lt;conditions&gt;
+    &lt;event_cue_signalled cue="md.Hotkey_API.Reloaded" /&gt;
+  &lt;/conditions&gt;
+  &lt;actions&gt;
+    &lt;signal_cue_instantly cue="md.Hotkey_API.Register_Key" 
+      param="table[$key='shift a', $id='kc_target_follow']"/&gt;
+  &lt;/actions&gt;
+&lt;/cue&gt;
+</pre>
+
+<h2>Contexts</h2>
+<p>Actions can specify valid contexts:</p>
+<ul>
+<li>When flying</li>
+<li>When walking</li>
+<li>In any menu</li>
+<li>In specifically named menus</li>
+</ul>
+
+<h2>Limitations</h2>
+<ul>
+<li>Windows backend confuses numpad enter and numpad / with non-numpad counterparts</li>
+<li>Currently only supports keyboard inputs</li>
+</ul>
+
+<p><a href="https://forum.egosoft.com/viewtopic.php?t=420407">Original thread</a></p>
+</body>
+</html>
