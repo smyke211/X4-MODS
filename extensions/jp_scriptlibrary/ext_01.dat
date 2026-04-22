@@ -1,0 +1,3344 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.ConvertARGBtoHex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="ALPHA" default="255"/>
+      <param name="RED"   default="3"/>
+      <param name="GREEN" default="161"/>
+      <param name="BLUE"  default="252"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.ConvertARGBtoHex'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <create_list name="$TempDecimalNumbers"/>
+         <create_list name="$ConstructedHexNumber"/>
+         <append_list_elements name="$TempDecimalNumbers" other="[$ALPHA, $RED, $GREEN, $BLUE]"/>
+
+         <do_for_each name="$_DecimalNumber" in="$TempDecimalNumbers">
+            <do_if value="$_DecimalNumber != 0">
+               <set_value name="$ActualDecimal" exact="($_DecimalNumber)i"/>
+               <create_list name="$TempHexNumber"/>
+               <do_while value="$ActualDecimal != 0">
+                  <wait exact="1ms"/>
+                  <set_value name="$Remainder" exact="$ActualDecimal % 16"/>
+                  <do_if value="$Remainder le 9">
+                     <append_to_list name="$TempHexNumber" exact="'%1'.[$Remainder]"/>
+                  </do_if>
+                  <do_elseif value="$Remainder" exact="10">
+                     <append_to_list name="$TempHexNumber" exact="'A'"/>
+                  </do_elseif>
+                  <do_elseif value="$Remainder" exact="11">
+                     <append_to_list name="$TempHexNumber" exact="'B'"/>
+                  </do_elseif>
+                  <do_elseif value="$Remainder" exact="12">
+                     <append_to_list name="$TempHexNumber" exact="'C'"/>
+                  </do_elseif>
+                  <do_elseif value="$Remainder" exact="13">
+                     <append_to_list name="$TempHexNumber" exact="'D'"/>
+                  </do_elseif>
+                  <do_elseif value="$Remainder" exact="14">
+                     <append_to_list name="$TempHexNumber" exact="'E'"/>
+                  </do_elseif>
+                  <do_elseif value="$Remainder" exact="15">
+                     <append_to_list name="$TempHexNumber" exact="'F'"/>
+                  </do_elseif>
+                  <set_value name="$ActualDecimal" exact="$ActualDecimal / 16"/>
+               </do_while>
+               <do_if value="$TempHexNumber.count == 0">
+                  <append_list_elements name="$TempHexNumber" other="['0', '0']"/>
+               </do_if>
+               <do_elseif value="$TempHexNumber.count == 1">
+                  <append_to_list name="$TempHexNumber" exact="'0'"/>
+               </do_elseif>
+               <do_for_each name="$Number" in="$TempHexNumber" reverse="true">
+                  <append_to_list name="$ConstructedHexNumber" exact="$Number"/>
+               </do_for_each>
+            </do_if>
+            <do_else>
+               <append_list_elements name="$ConstructedHexNumber" other="['0', '0']"/>
+            </do_else>
+         </do_for_each>
+
+         <set_value name="$_HexColorString" exact="'\033#%1%2%3%4%5%6%7%8#'.[$ConstructedHexNumber.{1}, $ConstructedHexNumber.{2}, $ConstructedHexNumber.{3}, $ConstructedHexNumber.{4}, $ConstructedHexNumber.{5}, $ConstructedHexNumber.{6}, $ConstructedHexNumber.{7}, $ConstructedHexNumber.{8}]"/>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_HexColorString"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.FindStationToEquipAt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.FindStationToEquipAt'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <create_list name="$_FoundStations"/>
+         <find_station name="$_FoundStations" space="player.galaxy" multiple="true">
+            <match knownto="$_Ship.owner"/>
+            <match checkoperational="true"/>
+            <match cansupplyclass="$_Ship.class"/>
+            <match canequipclass="$_Ship.class"/>
+            <match hascontrolentity="controlpost.shiptrader"/>
+            <match_relation_to faction="$_Ship.owner" comparison="ge" relation="dock"/>
+         </find_station>
+
+         <do_if value="$_FoundStations.count gt 1">
+            <run_script name="'jp.lib.SortByEstimatedTravelTime'" result="$_FoundStations">
+               <param name="LIST" value="$_FoundStations"/>
+            </run_script>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_FoundStations"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.GetFactionColorCode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="FACTION" default="null"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.GetFactionColorCode'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <set_value name="$_FactionColorCode" exact="'\033#FFFFFFFF#'"/>
+         <do_if value="$FACTION == faction.player">
+            <set_value name="$_FactionColorCode" exact="'\033#FF39ff40#'"/>
+         </do_if>
+         <do_elseif value="$FACTION == faction.alliance">
+            <set_value name="$_FactionColorCode" exact="'\033#FFb03cca#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.antigone">
+            <set_value name="$_FactionColorCode" exact="'\033#FF5097de#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.argon">
+            <set_value name="$_FactionColorCode" exact="'\033#FF0055ff#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.buccaneers">
+            <set_value name="$_FactionColorCode" exact="'\033#FF5900ff#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.civilian">
+            <set_value name="$_FactionColorCode" exact="'\033#FF979797#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.criminal">
+            <set_value name="$_FactionColorCode" exact="'\033#FFc90000#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.hatikvah">
+            <set_value name="$_FactionColorCode" exact="'\033#FF20f6fd#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.holyorder">
+            <set_value name="$_FactionColorCode" exact="'\033#FFff72ad#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.holyorderfanatic">
+            <set_value name="$_FactionColorCode" exact="'\033#FF8a0101#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.khaak">
+            <set_value name="$_FactionColorCode" exact="'\033#FFf0aeed#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.ministry">
+            <set_value name="$_FactionColorCode" exact="'\033#FF94bc92#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.ownerless">
+            <set_value name="$_FactionColorCode" exact="'\033#FF979797#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.paranid">
+            <set_value name="$_FactionColorCode" exact="'\033#FF8000ff#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.scaleplate">
+            <set_value name="$_FactionColorCode" exact="'\033#FF89823a#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.smuggler">
+            <set_value name="$_FactionColorCode" exact="'\033#FFc90000#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.teladi">
+            <set_value name="$_FactionColorCode" exact="'\033#FFa9c22e#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.trinity">
+            <set_value name="$_FactionColorCode" exact="'\033#FFbf39d7#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.visitor">
+            <set_value name="$_FactionColorCode" exact="'\033#FFffff00#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.xenon">
+            <set_value name="$_FactionColorCode" exact="'\033#FFc90000#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.pioneers">
+            <set_value name="$_FactionColorCode" exact="'\033#FF41aa9a#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.terran">
+            <set_value name="$_FactionColorCode" exact="'\033#FFbcd0fb#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.yaki">
+            <set_value name="$_FactionColorCode" exact="'\033#FFfe8dfa#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.court">
+            <set_value name="$_FactionColorCode" exact="'\033#FFffd500#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.fallensplit">
+            <set_value name="$_FactionColorCode" exact="'\033#FFfbb298#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.freesplit">
+            <set_value name="$_FactionColorCode" exact="'\033#FFff9d00#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.split">
+            <set_value name="$_FactionColorCode" exact="'\033#FFff691e#'"/>
+         </do_elseif>
+         <do_elseif value="$FACTION == faction.boron">
+            <set_value name="$_FactionColorCode" exact="'\033#FF4dc4ff#'"/>
+         </do_elseif>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_FactionColorCode"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.GetFactionRelationColorCode" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="FACTION_RELATION" default="null"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.GetFactionRelationColorCode'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <set_value name="$_Table" exact="table[]"/>
+         <set_value name="$_Table.{-30}" exact="[[255,   0,   0], [255,   0,   0], 30.0,  1.0]" comment="[Red     to Red,     Initial value: 30.0, Transition range:  1.0]"/>
+         <set_value name="$_Table.{-10}" exact="[[255,   0,   0], [255, 100, 100], 30.0, 20.0]" comment="[Red     to L.Red,   Initial value: 30.0, Transition range: 20.0]"/>
+         <set_value name="$_Table.{0}"   exact="[[255, 100, 100], [192, 192, 192], 10.0, 10.0]" comment="[L.Red   to Gray,    Initial value: 10.0, Transition range: 10.0]"/>
+         <set_value name="$_Table.{10}"  exact="[[192, 192, 192], [128, 255, 128],  0.0, 10.0]" comment="[Gray    to L.Green, Initial value:  0.0, Transition range: 10.0]"/>
+         <set_value name="$_Table.{15}"  exact="[[128, 255, 128], [0,   255,   0], 10.0,  5.0]" comment="[L.Green to Green,   Initial value: 10.0, Transition range:  5.0]"/>
+         <set_value name="$_Table.{30}"  exact="[[  0, 255,   0], [0,   136, 255], 15.0, 15.0]" comment="[Green   to Blue,    Initial value: 15.0, Transition range: 15.0]"/>
+
+         <do_for_each name="$_Key" valuename="$_Value" in="$_Table">
+            <do_if value="$FACTION_RELATION le $_Key">
+               <do_if value="$FACTION_RELATION le 0">
+                  <set_value name="$_BlendRatio" exact="(($FACTION_RELATION)f + $_Value.{3}) / $_Value.{4}"/>
+               </do_if>
+               <do_else>
+                  <set_value name="$_BlendRatio" exact="(($FACTION_RELATION)f - $_Value.{3}) / $_Value.{4}"/>
+               </do_else>
+               <set_value name="$_R" exact="($_Value.{1}.{1} * (1 - $_BlendRatio) + $_Value.{2}.{1} * $_BlendRatio)i"/>
+               <set_value name="$_G" exact="($_Value.{1}.{2} * (1 - $_BlendRatio) + $_Value.{2}.{2} * $_BlendRatio)i"/>
+               <set_value name="$_B" exact="($_Value.{1}.{3} * (1 - $_BlendRatio) + $_Value.{2}.{3} * $_BlendRatio)i"/>
+               <break/>
+            </do_if>
+         </do_for_each>
+
+         <run_script name="'jp.lib.ConvertARGBtoHex'" result="$_FactionRelationColorCode">
+            <param name="ALPHA" value="255"/>
+            <param name="RED" value="$_R"/>
+            <param name="GREEN" value="$_G"/>
+            <param name="BLUE" value="$_B"/>
+         </run_script>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_FactionRelationColorCode"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.IdleReturnHome" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <order id="JP_lib_IdleReturnHome" name="{8888888, 40}" category="internal" infinite="false" allowinloop="false" canplayercancel="true">
+      <params>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="IDLE_TIME"      type="internal" default="null"/>
+         <param name="IDLE_MOVE_TO"   type="internal" default="null"/>
+         <param name="WHERE_TO_MOVE"  type="internal" default="null"/>
+         <param name="START_POSITION" type="internal" default="null"/>
+         <param name="IDLE_FOLLOW"    type="internal" default="null"/>
+         <param name="WHO_TO_FOLLOW"  type="internal" default="null"/>
+         <param name="IDLE_DOCKING"   type="internal" default="null"/>
+         <param name="FIND_STATION"   type="internal" default="null"/>
+         <param name="WHERE_TO_DOCK"  type="internal" default="null"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="debugchance" type="internal" default="0"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      </params>
+   </order>
+
+   <interrupts>
+      <handler comment="Handler to cancel IdleReturnHome Orders, add this also to all sub orders created by IdleReturnHome">
+         <conditions>
+            <event_object_signalled object="this.ship" param="'Cancel_IdleReturnHome'"/>
+         </conditions>
+         <actions>
+            <cancel_order order="this.ship.order"/>
+         </actions>
+      </handler>
+   </interrupts>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="global.$SL_IdleShips.{$_Ship}" exact="player.age"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.IdleReturnHome'"/>
+         <set_value name="$_DebugFileName"   exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <substitute_text source="$_Ship.knownname" text="$_ResultName">
+            <replace string="'\033#FFCEFBA1# ~ Idle\033X'" with="''"/>
+         </substitute_text>
+         <do_if value="$_Ship.knownname == $_ResultName">
+            <set_object_name object="$_Ship" name="$_Ship.knownname + '\033#FFCEFBA1# ~ Idle\033X'"/>
+         </do_if>
+
+         <do_if value="not $IDLE_MOVE_TO and not $IDLE_FOLLOW and not $IDLE_DOCKING">
+            <set_value name="$IDLE_MOVE_TO" exact="true" chance="100"/>
+            <set_value name="$WHERE_TO_MOVE" exact="$START_POSITION"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.standingby"/>
+
+         <label name="IDLE_MOVE_TO_LBL"/>
+         <do_if value="$IDLE_MOVE_TO">
+            <do_if value="$_Ship.distanceto.[$WHERE_TO_MOVE.{1}, $WHERE_TO_MOVE.{2}] gt 10km">
+               <create_order id="'JP_lib_MoveToPosition'" object="$_Ship" immediate="true">
+                  <param name="SECTOR"   value="$WHERE_TO_MOVE.{1}"/>
+                  <param name="POSITION" value="$WHERE_TO_MOVE.{2}"/>
+               </create_order>
+               <wait exact="1ms"/>
+            </do_if>
+            <do_else>
+               <wait exact="$IDLE_TIME"/>
+            </do_else>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="IDLE_FOLLOW_LBL"/>
+         <do_if value="$IDLE_FOLLOW">
+            <do_if value="$WHO_TO_FOLLOW == null">
+               <set_value name="$IDLE_MOVE_TO" exact="true"/>
+               <resume label="IDLE_MOVE_TO_LBL"/>
+            </do_if>
+            <create_order object="$_Ship" id="'Follow'" immediate="true">
+               <param name="IDLE_RETURN_HOME" value="true"/>
+               <param name="target" value="$WHO_TO_FOLLOW"/>
+            </create_order>
+            <wait exact="1ms"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="IDLE_DOCKING_LBL"/>
+         <do_if value="$IDLE_DOCKING">
+            <do_if value="not @$WHERE_TO_DOCK.dockingallowed.{$_Ship}">
+               <do_if value="$FIND_STATION">
+                  <create_list name="$_FoundStations"/>
+                  <find_station name="$_FoundStations" space="player.galaxy" multiple="true">
+                     <match knownto="$_Ship.owner"/>
+                     <match checkoperational="true"/>
+                     <match_relation_to faction="$_Ship.owner" comparison="ge" relation="dock"/>
+                  </find_station>
+                  <run_script name="'jp.lib.SortByEstimatedTravelTime'" result="$_FoundStations">
+                     <param name="LIST" value="$_FoundStations"/>
+                  </run_script>
+                  <do_for_each name="$_FoundStation" in="$_FoundStations">
+                     <do_if value="$_FoundStation.dockingallowed.{$_Ship}">
+                        <set_value name="$WHERE_TO_DOCK" exact="$_FoundStation"/>
+                        <break/>
+                     </do_if>
+                  </do_for_each>
+               </do_if>
+               <do_if value="not @$WHERE_TO_DOCK.dockingallowed.{$_Ship}">
+                  <set_value name="$IDLE_MOVE_TO" exact="true"/>
+                  <resume label="IDLE_MOVE_TO_LBL"/>
+               </do_if>
+            </do_if>
+            <create_order object="$_Ship" id="'DockAndWait'" immediate="true">
+               <param name="IDLE_RETURN_HOME" value="true"/>
+               <param name="destination" value="$WHERE_TO_DOCK"/>
+               <param name="timeout" value="999h"/>
+            </create_order>
+            <wait exact="1ms"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.MessageLog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd" version="1">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="GENERATE_TITLE"       default="true"/>
+      <param name="TITLE"                default="''"/>
+      <param name="TEXT"                 default="''"/>
+      <param name="MESSAGE_TEXT"         default="''"/>
+      <param name="LOG_TEXT"             default="''"/>
+      <param name="INTERACTION_OBJECT"   default="this.ship"/>
+      <param name="INTERACTION_POSITION" default="position.[0, 0, 0]"/>
+      <param name="MESSAGE_POSITION"     default="1"/>
+      <param name="MESSAGE_CHANCE"       default="1"/>
+      <param name="LOG_CHANCE"           default="1"/>
+      <param name="CATEGORY"             default="'upkeep'"/>
+      <param name="INTERACTION"          default="'showonmap'"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$MESSAGE_TEXT == ''">
+         <set_value name="$MESSAGE_TEXT" exact="$TEXT"/>
+      </do_if>
+      <do_if value="$LOG_TEXT == ''">
+         <set_value name="$LOG_TEXT" exact="$TEXT"/>
+      </do_if>
+      <do_if value="$GENERATE_TITLE and $TITLE == ''">
+         <set_value name="$TITLE" exact="'%1 ~ %2 [%3]'.[$_DefaultOrderParamRef.name, $_Ship.knownname, $_Ship.idcode]"/>
+         <substitute_text source="$TITLE" text="$TITLE">
+            <replace string="'\033#FFCEFBA1# ~ Idle\033X'"   with="''"/>
+            <replace string="'\033#FFA95908##ASE-G\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##AE-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##AE-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##CP-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##CP-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##DVE-G\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##SD-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SD-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SE-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SE-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##TSE-S\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##TSE-G\033X ~ '" with="''"/>
+         </substitute_text>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$SHOW_MESSAGES" exact="@$_DefaultOrderParamRef.$SHOW_MESSAGES"/>
+      <set_value name="$WRITE_TO_LOG"  exact="@$_DefaultOrderParamRef.$WRITE_TO_LOG"/>
+      <set_value name="$DEBUG"         exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.MessageLog'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_value name="$_ShowMessages" exact="if $SHOW_MESSAGES ge $MESSAGE_CHANCE then 100 else 0"/>
+         <set_value name="$_WriteToLog"   exact="if $WRITE_TO_LOG ge $LOG_CHANCE then 100 else 0"/>
+
+         <show_help custom="$TITLE + '\n\n' + $MESSAGE_TEXT" position="$MESSAGE_POSITION" allowclose="true" chance="$_ShowMessages"/>
+
+         <do_if value="$CATEGORY == 'general'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="general" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="general" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_if>
+         <do_elseif value="$CATEGORY == 'missions'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="missions" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="missions" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_elseif>
+         <do_elseif value="$CATEGORY == 'news'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="news" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="news" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_elseif>
+         <do_elseif value="$CATEGORY == 'upkeep'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="upkeep" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="upkeep" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_elseif>
+         <do_elseif value="$CATEGORY == 'alerts'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="alerts" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="alerts" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_elseif>
+         <do_elseif value="$CATEGORY == 'tips'">
+            <do_if value="$INTERACTION == 'showonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="tips" interaction="showonmap" object="$INTERACTION_OBJECT" chance="$_WriteToLog"/>
+            </do_if>
+            <do_elseif value="$INTERACTION == 'showlocationonmap'">
+               <write_to_logbook title="$TITLE" text="$LOG_TEXT" category="tips" interaction="showlocationonmap" object="$INTERACTION_OBJECT" position="$INTERACTION_POSITION" chance="$_WriteToLog"/>
+            </do_elseif>
+         </do_elseif>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.MoveThroughGate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <order id="JP_lib_MoveThroughGate" name="Move through Gate" category="internal" infinite="false" allowinloop="false" canplayercancel="true">
+      <params>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="GATE" type="internal" default="null"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="debugchance" type="internal" default="0"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      </params>
+      <location object="$LOCATION.{1}" position="$LOCATION.{2}" condition="@$LOCATION.{1} != null and @$LOCATION.{2} != null"/>
+      <location object="$LOCATION.{1}" condition="@$LOCATION.{1} != null"/>
+   </order>
+
+   <interrupts>
+      <library>
+         <actions name="CalculateRandomGateApproachOffsets">
+            <set_value name="$_RandomOffsetX" min="-1000m" max="1000m" profile="bell"/>
+            <set_value name="$_RandomOffsetY" min="-1000m" max="1000m" profile="bell"/>
+            <set_value name="$_RandomOffsetZ" min="3000m"  max="6000m" profile="bell"/>
+         </actions>
+      </library>
+      <handler ref="AttackHandler"/>
+      <handler ref="MissileLockHandler" />
+      <handler ref="ScannedHandler"/>
+      <handler ref="InspectedHandler"/>
+      <handler ref="FoundAbandonedHandler"/>
+      <handler ref="FoundLockboxHandler"/>
+      <handler ref="ResupplyHandler"/>
+      <handler ref="TideHandler"/>
+   </interrupts>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_IsCapShip" exact="$_Ship.isclass.{[class.ship_l, class.ship_xl]}"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.MoveThroughGate'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <!-- TODO: Adjust the transition into other sectors for L/XL ships (Warp Drive)? -->
+
+         <set_command command="command.move" param="$GATE"/>
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <!-- Determine the entry and exit gates based on the gate type. -->
+         <do_if value="$GATE.isclass.gate or $GATE.isclass.highwayentrygate">
+            <set_value name="$_EntryGate" exact="$GATE"/>
+            <set_value name="$_ExitGate"  exact="$GATE.exit"/>
+         </do_if>
+         <do_elseif value="$GATE.isclass.highway">
+            <set_value name="$_EntryGate" exact="$GATE.entry"/>
+            <set_value name="$_ExitGate" exact="$GATE.entry.exit"/>
+         </do_elseif>
+
+         <!-- Assign the sectors and types based on the gate -->
+         <set_value name="$_EntryGateSector" exact="$_EntryGate.sector"/>
+         <set_value name="$_ExitGateSector"  exact="$_ExitGate.sector"/>
+         <set_value name="$_IsGate"          exact="@$_EntryGate.isclass.gate and not @$_EntryGate.isaccelerator"/>
+         <set_value name="$_IsAccelerator"   exact="@$_EntryGate.isclass.gate and @$_EntryGate.isaccelerator"/>
+         <set_value name="$_IsSuperhighway"  exact="@$_EntryGate.isclass.highwayentrygate"/>
+
+         <!-- Include code that calculates random offsets for the final approach position to the gate -->
+         <set_value name="$_Gate" exact="$_EntryGate"/>
+         <include_interrupt_actions ref="CalculateRandomGateApproachOffsets"/>
+
+         <!-- Determine ship movement based on the type of gate and the size of the ship -->
+         <do_if value="@$_IsGate and @$_IsCapShip">
+            <!-- Specific behavior for capital ships and gates -->
+            <set_value name="$_Radius" exact="4km"/>
+            <create_list name="$_CapShipApproachPositions"/>
+
+            <create_position name="$_EvalPosLeft" space="$_EntryGateSector" object="$_EntryGate" x="-$_Radius"/>
+            <create_position name="$_EvalPosRight" space="$_EntryGateSector" object="$_EntryGate" x="$_Radius"/>
+
+            <do_if value="$_Ship.distanceto.[$_EntryGateSector, $_EvalPosLeft] lt $_Ship.distanceto.[$_EntryGateSector, $_EvalPosRight]">
+               <set_value name="$_Radius" exact="-$_Radius"/>
+               <set_value name="$_AngleSteps" exact="[0, 45, 90, 135, 180]"/>
+            </do_if>
+            <do_else>
+               <set_value name="$_Radius" exact="$_Radius"/>
+               <set_value name="$_AngleSteps" exact="[0, -45, -90, -135, -180]"/>
+            </do_else>
+
+            <do_for_each name="$_Angle" in="$_AngleSteps">
+               <set_value name="$_AngleRadian" exact="$_Angle * pi / 180"/>
+               <create_position name="$_CirclePos" space="$_EntryGateSector" object="$_EntryGate"
+                                x="$_Radius * cos($_AngleRadian) + $_Radius"
+                                y="0"
+                                z="$_Radius * sin($_AngleRadian) + -$_RandomOffsetZ"/>
+
+               <append_to_list name="$_CapShipApproachPositions" exact="$_CirclePos"/>
+            </do_for_each>
+         </do_if>
+         <do_elseif value="@$_IsSuperhighway">
+            <!-- Specific behavior for superhighways -->
+            <get_safe_pos result="$_EntryGateApproachPosition" sector="$_EntryGateSector" object="$_EntryGate" radius="$_Ship.size" ignored="$_Ship" x="$_RandomOffsetX" y="$_RandomOffsetY" z="-$_RandomOffsetZ"/>
+         </do_elseif>
+         <do_else>
+            <!-- Default behavior ~ includes jump gates and accelerators -->
+            <get_safe_pos result="$_EntryGateApproachPosition" sector="$_EntryGateSector" object="$_EntryGate" radius="$_Ship.size" ignored="$_Ship" x="$_RandomOffsetX" y="$_RandomOffsetY" z="$_RandomOffsetZ"/>
+         </do_else>
+
+         <!-- For capital ships, use the list of approach positions -->
+         <!-- For all other ships, use the calculated approach position. -->
+         <do_if value="@$_IsCapShip">
+            <set_value name="$LOCATION" exact="[$_EntryGateSector, $_CapShipApproachPositions.{1}]"/>
+            <run_script name="'jp.lib.MoveToPosition'">
+               <param name="SECTOR" value="$_EntryGateSector"/>
+               <param name="POSITIONS" value="$_CapShipApproachPositions"/>
+               <param name="FORCE_POSITION" value="true"/>
+               <param name="FINISH_ON_APPROACH" value="true"/>
+            </run_script>
+         </do_if>
+         <do_else>
+            <set_value name="$LOCATION" exact="[$_EntryGateSector, $_EntryGateApproachPosition]"/>
+            <run_script name="'jp.lib.MoveToPosition'">
+               <param name="SECTOR" value="$_EntryGateSector"/>
+               <param name="POSITION" value="$_EntryGateApproachPosition"/>
+               <param name="FORCE_POSITION" value="true"/>
+               <param name="FINISH_ON_APPROACH" value="true"/>
+            </run_script>
+         </do_else>
+
+         <set_value name="$LOCATION" exact="[$_ExitGate, null]"/>
+         <!-- Execute the transition through the gate based on the ship size. -->
+         <do_if value="@$_IsGate or @$_IsAccelerator">
+            <do_if value="@$_IsCapShip">
+               <move_gate object="$_Ship" gate="$_EntryGate">
+                  <interrupt>
+                     <conditions>
+                        <event_object_changed_sector object="$_Ship"/>
+                     </conditions>
+                  </interrupt>
+               </move_gate>
+            </do_if>
+            <do_else>
+               <move_to object="$_Ship" destination="$_ExitGate">
+                  <interrupt>
+                     <conditions>
+                        <event_object_changed_sector object="$_Ship"/>
+                     </conditions>
+                  </interrupt>
+               </move_to>
+            </do_else>
+            <stop_moving object="$_Ship" immediate="true"/>
+            <warp object="$_Ship" sector="$_ExitGateSector">
+               <position space="$_ExitGateSector" object="$_ExitGate" value="position.[$_RandomOffsetX, $_RandomOffsetY, 1km + $_Ship.length / 2]"/>
+               <rotation pitch="$_ExitGate.rotation.pitch" yaw="$_ExitGate.rotation.yaw" roll="$_ExitGate.rotation.roll"/>
+            </warp>
+         </do_if>
+
+         <!-- Transition through the Superhighway. -->
+         <do_if value="@$_IsSuperhighway">
+            <move_to object="$_Ship" destination="$_ExitGate">
+               <interrupt>
+                  <conditions>
+                     <event_object_changed_zone object="$_Ship"/>
+                     <check_value value="event.param.isclass.highway"/>
+                  </conditions>
+               </interrupt>
+            </move_to>
+            <wait exact="60s">
+               <interrupt>
+                  <conditions>
+                     <event_object_changed_sector object="$_Ship"/>
+                  </conditions>
+               </interrupt>
+            </wait>
+         </do_if>
+
+         <!-- Include code that calculates random offsets for the final position for clearing the gate -->
+         <set_value name="$_Gate" exact="$_ExitGate"/>
+         <include_interrupt_actions ref="CalculateRandomGateApproachOffsets"/>
+
+         <!-- After the transition, move the ship away from the exit gate to a safe position. -->
+         <remove_value name="$_MaxOffset"/>
+         <get_safe_pos result="$_ExitGateApproachPosition" sector="$_ExitGateSector" object="$_ExitGate" radius="$_Ship.size" ignored="$_Ship"  x="$_RandomOffsetX" y="$_RandomOffsetY" z="$_RandomOffsetZ"/>
+         <set_value name="$LOCATION" exact="[$_ExitGateSector, $_ExitGateApproachPosition]"/>
+         <run_script name="'jp.lib.MoveToPosition'">
+            <param name="SECTOR" value="$_ExitGateSector"/>
+            <param name="POSITION" value="$_ExitGateApproachPosition"/>
+            <param name="FORCE_POSITION" value="true"/>
+            <param name="FINISH_ON_APPROACH" value="true"/>
+         </run_script>
+
+         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.MoveToObject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <order id="JP_lib_MoveToObject" name="{8888888, 43}" category="internal" infinite="false" allowinloop="false" canplayercancel="true">
+      <params>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <!--DISTANCE_TO_OBJECT - used if $POSITION_SPACE is of class object
+             POSITION_SPACE - 'sector_space', 'object_space', any object
+             ROTATION_SPACE - 'sector_space', 'object_space', any object
+             ROTATION_ORIENTATION - 'align', 'look_at', 'look_away', 'align_left', 'align_right'
+             SAFE_POS_DIRECTION - 'up', 'down', 'left', 'right', 'forward', 'backward' -->
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="OBJECT"                   type="internal" default="null"/>
+         <param name="POSITION_SPACE"           type="internal" default="'object_space'"/>
+         <param name="POSITION_OFFSET"          type="internal" default="position.[0, 0, 0]"/>
+         <param name="DISTANCE_TO_OBJECT"       type="internal" default="10m"/>
+         <param name="ROTATION_SPACE"           type="internal" default="'object_space'"/>
+         <param name="ROTATION_ORIENTATION"     type="internal" default="'look_at'"/>
+         <param name="FORCE_POSITION"           type="internal" default="true"/>
+         <param name="FORCE_ROTATION"           type="internal" default="true"/>
+         <param name="GET_SAFE_POS"             type="internal" default="false"/>
+         <param name="SAFE_POS_DIRECTION"       type="internal" default="'up'"/>
+         <param name="SAFE_POS_OFFSET"          type="internal" default="position.[0, 0, 0]"/>
+         <param name="USE_LOCAL_HIGHWAY"        type="internal" default="this.ship.canenterhighway"/>
+         <param name="USE_TRAVEL_DRIVE"         type="internal" default="true"/>
+         <param name="FINISH_ON_APPROACH"       type="internal" default="false"/>
+         <param name="SKIP_SECTOR_CHECK"        type="internal" default="false"/>
+         <param name="IGNORE_DANGEROUS_REGIONS" type="internal" default="false"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="SECTOR"   type="internal" default="null"/>
+         <param name="POSITION" type="internal" default="null"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="debugchance" type="internal" default="0"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      </params>
+      <location object="$SECTOR" position="$POSITION" condition="@$SECTOR != null and @$POSITION != null"/>
+      <location object="$SECTOR" condition="@$SECTOR != null"/>
+   </order>
+
+   <interrupts>
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'MOVE_TO_OBJECT_INTERRUPT'"/>
+         </conditions>
+         <actions>
+            <abort_called_scripts resume="FINISH_LBL"/>
+         </actions>
+      </handler>
+      <handler ref="AttackHandler"/>
+      <handler ref="MissileLockHandler" />
+      <handler ref="ScannedHandler"/>
+      <handler ref="InspectedHandler"/>
+      <handler ref="FoundAbandonedHandler"/>
+      <handler ref="FoundLockboxHandler"/>
+      <handler ref="ResupplyHandler"/>
+      <handler ref="TideHandler"/>
+   </interrupts>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.MoveToObject'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command command="command.move" param="$OBJECT"/>
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <set_value name="$SECTOR" exact="$OBJECT.sector"/>
+         <do_if value="@$OBJECT.sector == null">
+            <do_if value="$OBJECT.isclass.highway">
+               <set_value name="$SECTOR" exact="$OBJECT.origin.sector"/>
+            </do_if>
+         </do_if>
+
+         <do_if value="not $SKIP_SECTOR_CHECK and $_Ship.sector != $SECTOR">
+            <create_order object="$_Ship" id="'JP_lib_MoveToSector'" immediate="true">
+               <param name="SECTOR" value="$SECTOR"/>
+            </create_order>
+            <wait exact="1ms"/>
+         </do_if>
+
+         <do_if value="$GET_SAFE_POS">
+            <do_if value="@$POSITION_SPACE == 'object_space'">
+               <get_safe_pos result="$POSITION" sector="$SECTOR" object="$OBJECT" radius="$_Ship.size" ignored="$_Ship" direction="$SAFE_POS_DIRECTION"
+                             x="$SAFE_POS_OFFSET.x" y="$SAFE_POS_OFFSET.y" z="$SAFE_POS_OFFSET.z"/>
+            </do_if>
+            <do_elseif value="@$POSITION_SPACE == 'sector_space'">
+               <create_position name="$POSITION" space="$SECTOR" object="$OBJECT"/>
+               <get_safe_pos result="$POSITION" sector="$SECTOR" object="$SECTOR" value="$POSITION" radius="$_Ship.size" ignored="$_Ship" direction="$SAFE_POS_DIRECTION"
+                             x="$SAFE_POS_OFFSET.x" y="$SAFE_POS_OFFSET.y" z="$SAFE_POS_OFFSET.z"/>
+            </do_elseif>
+         </do_if>
+         <do_else>
+            <!-- Create a new position by applying $POSITION_OFFSET to either object_space or sector_space -->
+            <do_if value="@$POSITION_SPACE == 'object_space'">
+               <create_position name="$POSITION" space="$SECTOR" object="$OBJECT" x="$POSITION_OFFSET.x" y="$POSITION_OFFSET.y" z="$POSITION_OFFSET.z"/>
+            </do_if>
+            <do_elseif value="@$POSITION_SPACE == 'sector_space'">
+               <create_position name="$POSITION" space="$SECTOR" object="$OBJECT"/>
+               <create_position name="$POSITION" space="$SECTOR" object="$SECTOR" value="$POSITION" x="$POSITION_OFFSET.x" y="$POSITION_OFFSET.y" z="$POSITION_OFFSET.z"/>
+            </do_elseif>
+            <!-- If $POSITION_SPACE is an object, create a position towards it -->
+            <do_elseif value="@$POSITION_SPACE.isclass.object">
+               <create_position name="$_DirectionObjectPos" space="$SECTOR" object="$POSITION_SPACE"/>
+               <create_position name="$_ObjectPos" space="$SECTOR" object="$OBJECT"/>
+               <create_orientation name="$DIRECTION" orientation="look_at" refposition="$_DirectionObjectPos">
+                  <position space="$SECTOR" value="$_ObjectPos"/>
+               </create_orientation>
+               <create_position name="$POSITION" space="$SECTOR" value="$_ObjectPos"
+                                x="$DISTANCE_TO_OBJECT * sin($DIRECTION.yaw)"
+                                y="$DISTANCE_TO_OBJECT * sin($DIRECTION.pitch)"
+                                z="$DISTANCE_TO_OBJECT * cos($DIRECTION.yaw)"/>
+            </do_elseif>
+         </do_else>
+
+         <!-- If $ROTATION_SPACE is an object, create a rotation towards it -->
+         <do_if value="@$ROTATION_SPACE.isclass.object">
+            <create_position name="$_DirectionObjectPos" space="$SECTOR" object="$ROTATION_SPACE"/>
+            <create_position name="$_ObjectPos" space="$SECTOR" object="$OBJECT"/>
+            <create_orientation name="$ROTATION" orientation="look_at" refposition="$_ObjectPos">
+               <position space="$SECTOR" value="$_DirectionObjectPos"/>
+            </create_orientation>
+         </do_if>
+         <!-- If $ROTATION_SPACE is 'object_space' create a rotation that depends on $ROTATION_ORIENTATION of the $OBJECT -->
+         <do_elseif value="@$ROTATION_SPACE == 'object_space'">
+            <create_position name="$_ObjectPos" space="$SECTOR" object="$OBJECT"/>
+            <do_if value="$ROTATION_ORIENTATION == 'look_at'">
+               <create_orientation name="$ROTATION" orientation="look_away" refposition="$POSITION">
+                  <position space="$SECTOR" value="$_ObjectPos"/>
+               </create_orientation>
+            </do_if>
+            <do_elseif value="$ROTATION_ORIENTATION == 'look_away'">
+               <create_orientation name="$ROTATION" orientation="look_at" refposition="$POSITION">
+                  <position space="$SECTOR" value="$_ObjectPos"/>
+               </create_orientation>
+            </do_elseif>
+            <do_elseif value="$ROTATION_ORIENTATION == 'align_left'">
+               <create_orientation name="$ROTATION" orientation="align_right" refposition="$POSITION">
+                  <position space="$SECTOR" value="$_ObjectPos"/>
+               </create_orientation>
+            </do_elseif>
+            <do_elseif value="$ROTATION_ORIENTATION == 'align_right'">
+               <create_orientation name="$ROTATION" orientation="align_left" refposition="$POSITION">
+                  <position space="$SECTOR" value="$_ObjectPos"/>
+               </create_orientation>
+            </do_elseif>
+            <do_else>
+               <create_rotation name="$ROTATION" value="$OBJECT.rotation"/>
+            </do_else>
+         </do_elseif>
+         <do_else>
+            <create_rotation name="$ROTATION" value="$_Ship.rotation"/>
+         </do_else>
+
+         <set_value name="this.$LOCATION" exact="[$SECTOR, $POSITION]"/>
+
+         <set_command command="command.move" param="$OBJECT"/>
+         <run_script name="'jp.lib.MoveToPosition'">
+            <param name="SECTOR"                   value="$SECTOR"/>
+            <param name="POSITION"                 value="$POSITION"/>
+            <param name="ROTATION"                 value="$ROTATION"/>
+            <param name="USE_LOCAL_HIGHWAY"        value="$USE_LOCAL_HIGHWAY"/>
+            <param name="USE_TRAVEL_DRIVE"         value="$USE_TRAVEL_DRIVE"/>
+            <param name="FINISH_ON_APPROACH"       value="$FINISH_ON_APPROACH"/>
+            <param name="FORCE_POSITION"           value="$FORCE_POSITION"/>
+            <param name="FORCE_ROTATION"           value="$FORCE_ROTATION"/>
+            <param name="IGNORE_DANGEROUS_REGIONS" value="$IGNORE_DANGEROUS_REGIONS"/>
+         </run_script>
+
+         <label name="FINISH_LBL"/>
+         <stop_moving object="$_Ship" immediate="true"/>
+         <stop_boost object="$_Ship"/>
+
+         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+      <stop_moving object="$_Ship" immediate="true"/>
+      <stop_boost object="$_Ship"/>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.MoveToPosition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <order id="JP_lib_MoveToPosition" name="{8888888, 42}" category="internal" infinite="false" allowinloop="false" canplayercancel="true">
+      <params>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="SECTOR"                   type="internal" default="this.ship.sector"/>
+         <param name="POSITION"                 type="internal" default="position.[0, 0, 0]" comment="In same Sector and in Sector coordinates"/>
+         <param name="POSITIONS"                type="internal" default="[]"                 comment="In same Sector and in Sector coordinates"/>
+         <param name="POSITIONS_REVERSED"       type="internal" default="false"/>
+         <param name="ROTATION"                 type="internal" default="null"/>
+         <param name="FORCE_POSITION"           type="internal" default="true"/>
+         <param name="FORCE_ROTATION"           type="internal" default="false"/>
+         <param name="USE_LOCAL_HIGHWAY"        type="internal" default="this.ship.canenterhighway"/>
+         <param name="USE_TRAVEL_DRIVE"         type="internal" default="true"/>
+         <param name="FINISH_ON_APPROACH"       type="internal" default="true"/>
+         <param name="SKIP_SECTOR_CHECK"        type="internal" default="false"/>
+         <param name="IGNORE_DANGEROUS_REGIONS" type="internal" default="false"/>
+         <param name="IGNORE_SAFE_POS_CHECKS"   type="internal" default="false"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="debugchance" type="internal" default="0"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      </params>
+      <location object="$SECTOR" position="$POSITION" condition="@$SECTOR != null and @$POSITION != null"/>
+      <location object="$SECTOR" condition="@$SECTOR != null"/>
+   </order>
+
+   <interrupts>
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'MOVE_TO_POSITION_INTERRUPT'"/>
+         </conditions>
+         <actions>
+            <abort_called_scripts resume="FINISH_LBL"/>
+         </actions>
+      </handler>
+      <handler ref="AttackHandler"/>
+      <handler ref="MissileLockHandler" />
+      <handler ref="ScannedHandler"/>
+      <handler ref="InspectedHandler"/>
+      <handler ref="FoundAbandonedHandler"/>
+      <handler ref="FoundLockboxHandler"/>
+      <handler ref="ResupplyHandler"/>
+      <handler ref="TideHandler"/>
+   </interrupts>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$POSITIONS.count == 0">
+         <append_to_list name="$POSITIONS" exact="$POSITION"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.MoveToPosition'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.flying"/>
+
+         <do_if value="not $SKIP_SECTOR_CHECK and $_Ship.sector != $SECTOR">
+            <create_order object="$_Ship" id="'JP_lib_MoveToSector'" immediate="true">
+               <param name="SECTOR" value="$SECTOR"/>
+            </create_order>
+            <wait exact="1ms"/>
+         </do_if>
+
+         <do_if value="$POSITIONS_REVERSED">
+            <create_list name="$_TempPositions"/>
+            <do_for_each name="$_Pos" in="$POSITIONS" reverse="true">
+               <append_to_list name="$_TempPositions" exact="$_Pos"/>
+            </do_for_each>
+            <clear_list list="$POSITIONS"/>
+            <append_list_elements name="$POSITIONS" other="$_TempPositions"/>
+            <remove_value name="$_TempPositions"/>
+         </do_if>
+
+         <do_for_each name="$POSITION" in="$POSITIONS">
+
+            <!-- Long distance travel -->
+            <get_zone_at_position name="$_PositionZone" sector="$SECTOR" value="$POSITION"/>
+            <do_if value="$_Ship.zone != $_PositionZone">
+               <get_safe_pos result="$POSITION" sector="$SECTOR" value="$POSITION" radius="$_Ship.size" ignored="$_Ship" ignoredangerousregions="$IGNORE_DANGEROUS_REGIONS" comment="Make sure $POSITION is still safe." chance="if not $IGNORE_SAFE_POS_CHECKS then 100 else 0"/>
+               <set_value name="this.$LOCATION" exact="[$SECTOR, $POSITION]"/>
+               <move_to object="$_Ship" destination="$SECTOR" forceposition="false" finishonapproach="true" uselocalhighways="$USE_LOCAL_HIGHWAY" travel="$USE_TRAVEL_DRIVE">
+                  <position space="$SECTOR" object="$SECTOR" value="$POSITION"/>
+                  <interrupt>
+                     <conditions>
+                        <event_object_changed_zone object="$_Ship"/>
+                        <check_value value="$_Ship.zone == $_PositionZone"/>
+                     </conditions>
+                  </interrupt>
+               </move_to>
+            </do_if>
+
+            <!-- Short distance travel -->
+            <get_safe_pos result="$POSITION" sector="$SECTOR" value="$POSITION" radius="$_Ship.size" ignored="$_Ship" ignoredangerousregions="$IGNORE_DANGEROUS_REGIONS" comment="Make sure $POSITION is still safe." chance="if not $IGNORE_SAFE_POS_CHECKS then 100 else 0"/>
+            <set_value name="this.$LOCATION" exact="[$SECTOR, $POSITION]"/>
+            <do_if value="@$ROTATION == null">
+               <move_to object="$_Ship" destination="$SECTOR" forceposition="$FORCE_POSITION" finishonapproach="$FINISH_ON_APPROACH" uselocalhighways="$USE_LOCAL_HIGHWAY" travel="$USE_TRAVEL_DRIVE">
+                  <position space="$SECTOR" object="$SECTOR" value="$POSITION"/>
+               </move_to>
+            </do_if>
+            <do_else>
+               <move_to object="$_Ship" destination="$SECTOR" forceposition="$FORCE_POSITION" forcerotation="$FORCE_ROTATION" finishonapproach="$FINISH_ON_APPROACH" uselocalhighways="$USE_LOCAL_HIGHWAY" travel="$USE_TRAVEL_DRIVE">
+                  <position space="$SECTOR" object="$SECTOR" value="$POSITION"/>
+                  <rotation value="$ROTATION"/>
+               </move_to>
+            </do_else>
+
+         </do_for_each>
+
+         <label name="FINISH_LBL"/>
+         <stop_moving object="$_Ship" immediate="true"/>
+         <stop_boost object="$_Ship"/>
+
+         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+      <stop_moving object="$_Ship" immediate="true"/>
+      <stop_boost object="$_Ship"/>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.MoveToSector" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <order id="JP_lib_MoveToSector" name="{8888888, 41}" category="internal" infinite="false" allowinloop="false" canplayercancel="true">
+      <params>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="SECTOR"            type="internal" default="null"/>
+         <param name="POSITION"          type="internal" default="null"/>
+         <param name="USE_LOCAL_HIGHWAY" type="internal" default="this.ship.canenterhighway"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+         <param name="debugchance" type="internal" default="0"/>
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      </params>
+      <location object="$SECTOR" position="$POSITION" condition="$SECTOR != null and $POSITION != null"/>
+      <location object="$SECTOR" condition="$SECTOR != null"/>
+   </order>
+
+   <interrupts>
+      <handler ref="AttackHandler"/>
+      <handler ref="MissileLockHandler" />
+      <handler ref="ScannedHandler"/>
+      <handler ref="InspectedHandler"/>
+      <handler ref="FoundAbandonedHandler"/>
+      <handler ref="FoundLockboxHandler"/>
+      <handler ref="ResupplyHandler"/>
+      <handler ref="TideHandler"/>
+   </interrupts>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_IsCapShip" exact="$_Ship.isclass.{[class.ship_l, class.ship_xl]}"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.MoveToSector'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <!-- TODO: Implement a blacklist usage that is stricter than the current one. -->
+
+         <set_command command="command.move" param="$SECTOR"/>
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <include_interrupt_actions ref="GetBlacklistgroup"/>
+
+         <!-- While ship isn't in the target sector, continue finding the path -->
+         <do_while value="$_Ship.sector != $SECTOR">
+            <wait exact="1ms"/>
+
+            <!-- Get the global path to the target sector by using the associated blacklist group -->
+            <get_global_path component="$_PathComponents" refobject="$_Ship" uselocalhighways="$USE_LOCAL_HIGHWAY" useblacklist="$blacklistgroup" multiple="true">
+               <start object="$_Ship"/>
+               <end object="$SECTOR"/>
+            </get_global_path>
+
+            <!-- If there is no path, we try again without using the blacklist,
+                 and if that fails, the sector is unreachable. -->
+            <do_if value="$_PathComponents.count lt 2">
+               <get_global_path component="$_PathComponents" refobject="$_Ship" uselocalhighways="$USE_LOCAL_HIGHWAY" multiple="true">
+                  <start object="$_Ship"/>
+                  <end object="$SECTOR"/>
+               </get_global_path>
+            </do_if>
+
+            <!-- Iterate through each path component -->
+            <do_for_each name="$_PathComponent" in="$_PathComponents" counter="$_it">
+
+               <set_value name="$_PathComponentSector" exact="$_PathComponent.sector"/>
+               <do_if value="@$_PathComponentSector == null">
+                  <do_if value="@$_PathComponent.issuperhighway">
+                     <set_value name="$_PathComponentSector" exact="$_PathComponent.origin.sector"/>
+                  </do_if>
+               </do_if>
+
+               <!-- Handle the special case of the Ring-Highway transition -->
+               <do_if value="$_PathComponent.isclass.highway and @$_PathComponent.exitjumpgate != null">
+                  <do_if value="not $_Ship.zone.isclass.highway">
+                     <set_flight_control_model object="$_Ship" flightcontrolmodel="flightcontrolmodel.spline"/>
+                     <move_to object="$_Ship" destination="$SECTOR" uselocalhighways="true" travel="true" finishonapproach="true">
+                        <interrupt>
+                           <conditions>
+                              <event_object_changed_zone object="$_Ship"/>
+                              <check_value value="$_Ship.zone.isclass.highway"/>
+                           </conditions>
+                        </interrupt>
+                     </move_to>
+                  </do_if>
+                  <do_if value="@$_PathComponents.indexof.{@$_PathComponent.exitjumpgate}">
+                     <wait exact="600s">
+                        <interrupt>
+                           <conditions>
+                              <event_object_changed_sector object="$_Ship"/>
+                           </conditions>
+                        </interrupt>
+                     </wait>
+                     <set_to_default_flight_control_model object="$_Ship"/>
+                     <break/>
+                  </do_if>
+               </do_if>
+
+               <!-- Handle other gate transitions -->
+               <set_to_default_flight_control_model object="$_Ship"/>
+               <do_if value="(@$_PathComponent.isclass.gate or @$_PathComponent.issuperhighway) and
+                              $_PathComponentSector == $_Ship.sector">
+                  <run_script name="'jp.lib.MoveThroughGate'">
+                     <param name="GATE" value="$_PathComponent"/>
+                  </run_script>
+                  <break/>
+               </do_if>
+
+            </do_for_each>
+
+         </do_while>
+
+         <!-- Leave the highway if in target sector -->
+         <do_if value="$_Ship.zone.isclass.highway">
+            <set_to_default_flight_control_model object="$_Ship"/>
+            <set_value name="$_RandomX" min="-2000m" max="2000m" profile="bell"/>
+            <create_position name="$_Position" space="$SECTOR" object="$_Ship" x="$_RandomX" y="2500m" z="10000m"/>
+            <move_to object="$_Ship" destination="$SECTOR" forceposition="true" finishonapproach="true">
+               <position space="$SECTOR" object="$SECTOR" value="$_Position"/>
+            </move_to>
+         </do_if>
+
+         <!-- Move to a specific position if provided -->
+         <do_if value="@$POSITION != null">
+            <run_script name="'jp.lib.MoveToPosition'">
+               <param name="SECTOR" value="$SECTOR"/>
+               <param name="POSITION" value="$POSITION"/>
+               <param name="SKIP_SECTOR_CHECK" value="true"/>
+            </run_script>
+         </do_if>
+
+         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+      <set_to_default_flight_control_model object="this.ship"/>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.RestockDeployables" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- Table with amounts mapped to deployables macros -->
+      <!-- Amounts are what we want at the end of the restock.. not the amount we need to change -->
+      <!-- If we go over the capacity of the ship, the $DEPLOYABLE_TABLE will be capped to the capacity -->
+      <param name="DEPLOYABLE_TABLE" default="table[]"/>
+      <param name="FORCE_RERSTOCK" default="false"/>
+      <param name="PURCHASE_THRESHOLD" default="100000Cr"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <set_value name="$_Result" exact="'Failed'"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_DeployablesCapacity" exact="$_Ship.ammostorage.deployable.capacity"/>
+      <set_value name="$_DeployablesFreeStorage" exact="$_Ship.ammostorage.deployable.free"/>
+      <set_value name="$_DeployablesToBuy" exact="table[]"/>
+      <set_value name="$_DeployablesToBuyAmount" exact="0"/>
+      <set_value name="$_DeployablesToSell" exact="table[]"/>
+      <set_value name="$_DeployablesToSellAmount" exact="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$RESTOCK_TITLE" exact="'%1 ~ %2 [%3]'.[$_DefaultOrderParamRef.name, $_Ship.knownname, $_Ship.idcode]"/>
+      <substitute_text source="$RESTOCK_TITLE" text="$RESTOCK_TITLE">
+         <replace string="'\033#FFCEFBA1# ~ Idle\033X'"   with="''"/>
+         <replace string="'\033#FFA95908##ASE-G\033X ~ '" with="''"/>
+         <replace string="'\033#FFA95908##AE-S\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##AE-G\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##CP-S\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##CP-G\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##DVE-G\033X ~ '" with="''"/>
+         <replace string="'\033#FFA95908##SD-S\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##SD-G\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##SE-S\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##SE-G\033X ~ '"  with="''"/>
+         <replace string="'\033#FFA95908##TSE-S\033X ~ '" with="''"/>
+         <replace string="'\033#FFA95908##TSE-G\033X ~ '" with="''"/>
+      </substitute_text>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$SHOW_MESSAGES" exact="@$_DefaultOrderParamRef.$SHOW_MESSAGES"/>
+      <set_value name="$WRITE_TO_LOG" exact="@$_DefaultOrderParamRef.$WRITE_TO_LOG"/>
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.RestockDeployables'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command command="command.resupply"/>
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <!-- Calculate the total amount of storage needed for the deployables inside the $DEPLOYABLE_TABLE -->
+         <set_value name="$_TotalStorageNeeded" exact="0"/>
+         <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$DEPLOYABLE_TABLE">
+            <set_value name="$_TotalStorageNeeded" exact="$_DeployableAmount" operation="add"/>
+         </do_for_each>
+
+         <!-- If there are more deployables in the $DEPLOYABLE_TABLE than the ship can hold,
+              we need to cap the $DEPLOYABLE_TABLE to the capacity of the ship. -->
+         <do_if value="$_TotalStorageNeeded gt $_DeployablesCapacity">
+            <do_while value="$_TotalStorageNeeded gt $_DeployablesCapacity">
+               <wait exact="1ms" comment="In case of an endless loop, the game will freeze if there is no wait."/>
+               <set_value name="$_HighestAmount" exact="0"/>
+               <set_value name="$_HighestMacro" exact="null"/>
+               <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$DEPLOYABLE_TABLE">
+                  <do_if value="$_DeployableAmount gt $_HighestAmount">
+                     <set_value name="$_HighestAmount" exact="$_DeployableAmount"/>
+                     <set_value name="$_HighestMacro" exact="$_DeployableMacro"/>
+                  </do_if>
+               </do_for_each>
+               <set_value name="$DEPLOYABLE_TABLE.{$_HighestMacro}" exact="1" operation="subtract"/>
+               <set_value name="$_TotalStorageNeeded"               exact="1" operation="subtract"/>
+            </do_while>
+         </do_if>
+
+         <!-- Populate the $_DeployablesToBuy and $_DeployablesToSell tables with
+              the macros and amounts of the deployables we need to buy and sell. -->
+         <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$DEPLOYABLE_TABLE">
+            <do_if value="$_DeployableAmount gt $_Ship.ammostorage.{$_DeployableMacro}.count">
+               <set_value name="$_DeployablesToBuy.{$_DeployableMacro}" exact="$_DeployableAmount - $_Ship.ammostorage.{$_DeployableMacro}.count" operation="add"/>
+               <set_value name="$_DeployablesToBuyAmount"               exact="$_DeployableAmount - $_Ship.ammostorage.{$_DeployableMacro}.count" operation="add"/>
+            </do_if>
+            <do_if value="$_DeployableAmount lt $_Ship.ammostorage.{$_DeployableMacro}.count">
+               <set_value name="$_DeployablesToSell.{$_DeployableMacro}" exact="$_Ship.ammostorage.{$_DeployableMacro}.count - $_DeployableAmount" operation="add"/>
+               <set_value name="$_DeployablesToSellAmount"               exact="$_Ship.ammostorage.{$_DeployableMacro}.count - $_DeployableAmount" operation="add"/>
+            </do_if>
+         </do_for_each>
+
+         <set_value name="$_TotalFreeStorage" exact="($_DeployablesFreeStorage + $_DeployablesToSellAmount)"/>
+
+         <!-- Not enough storage for the wanted Deployables and we are not allowed to sell any. -->
+         <!-- Should not occcur, but just in case the script that calls this script has forgotten to check for this. -->
+         <do_if value="not $FORCE_RERSTOCK and $_TotalFreeStorage == 0">
+            <do_if value="$DEBUG gt 0">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'Our storage is full and we are not allowed to sell any Deployables ~ $FORCE_RERSTOCK is false!'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+            <return value="'Failed'"/>
+         </do_if>
+
+         <do_if value="$FORCE_RERSTOCK and $_TotalFreeStorage lt $_DeployablesToBuyAmount">
+
+            <!-- We are allowed to sell some Deployables to make room for the wanted Deployables.
+                 So let's find out which Deployables we can sell. -->
+            <set_value name="$_PossibleSellableDeployables" exact="$_Ship.ammostorage.deployable.table"/>
+            <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$_DeployablesToBuy">
+               <set_value name="$_PossibleSellableDeployables.{$_DeployableMacro}" exact="0" operation="set"/>
+            </do_for_each>
+            <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$_DeployablesToSell">
+               <set_value name="$_PossibleSellableDeployables.{$_DeployableMacro}" exact="$_DeployableAmount" operation="subtract"/>
+            </do_for_each>
+            <set_value name="$_PossibleSellableDeployablesAmount" exact="0"/>
+            <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$_PossibleSellableDeployables">
+               <set_value name="$_PossibleSellableDeployablesAmount" exact="$_DeployableAmount" operation="add"/>
+            </do_for_each>
+
+            <!-- Add the Deployables we can sell to the $_DeployablesToSell table. -->
+            <do_while value="$_DeployablesToBuyAmount - $_TotalFreeStorage gt 0">
+               <wait exact="1ms" comment="In case of an endless loop, the game will freeze if there is no wait."/>
+               <do_if value="$_PossibleSellableDeployablesAmount == 0">
+                  <break/>
+               </do_if>
+               <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$_PossibleSellableDeployables">
+                  <do_if value="$_DeployableAmount gt 0">
+                     <set_value name="$_DeployablesToSell.{$_DeployableMacro}"           exact="1" operation="add"/>
+                     <set_value name="$_DeployablesToSellAmount"                         exact="1" operation="add"/>
+                     <set_value name="$_PossibleSellableDeployables.{$_DeployableMacro}" exact="1" operation="subtract"/>
+                     <set_value name="$_PossibleSellableDeployablesAmount"               exact="1" operation="subtract"/>
+                     <set_value name="$_TotalFreeStorage"                                exact="1" operation="add"/>
+                  </do_if>
+               </do_for_each>
+            </do_while>
+
+         </do_if>
+
+         <!-- Either we are allowed to sell Deployables to make space and there are not enough,
+              or we are not allowed to sell Deployables and we have not enough free storage.
+              Cap the deployables we want to buy to the amount of free storage we have. -->
+         <do_if value="$_TotalFreeStorage lt $_DeployablesToBuyAmount">
+            <do_while value="$_DeployablesToBuyAmount - $_TotalFreeStorage">
+               <wait exact="1ms" comment="In case of an endless loop, the game will freeze if there is no wait."/>
+               <do_for_each name="$_DeployableMacro" valuename="$_DeployableAmount" in="$_DeployablesToBuy">
+                  <do_if value="$_DeployablesToBuyAmount - $_TotalFreeStorage == 0">
+                     <break/>
+                  </do_if>
+                  <set_value name="$_DeployablesToBuy.{$_DeployableMacro}" exact="1" operation="subtract"/>
+                  <set_value name="$_DeployablesToBuyAmount"               exact="1" operation="subtract"/>
+               </do_for_each>
+            </do_while>
+         </do_if>
+
+         <!-- Create and populate the table that is used by add_build_to_modify_ship, 
+              by first adding all current Deployables, ammo and countermeasures to the table.
+              Then remove the Deployables we want to sell and add the Deployables we want to buy. -->
+         <set_value name="$_ModifiedEquipmentTable" exact="table[]"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.missile.table">
+            <set_value name="$_ModifiedEquipmentTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.countermeasure.table">
+            <set_value name="$_ModifiedEquipmentTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.deployable.table">
+            <set_value name="$_ModifiedEquipmentTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToSell">
+            <set_value name="$_ModifiedEquipmentTable.{$_EquipmentMacro}" exact="$_DeployablesToSell.{$_EquipmentMacro}" operation="subtract"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToBuy">
+            <set_value name="$_ModifiedEquipmentTable.{$_EquipmentMacro}" exact="$_DeployablesToBuy.{$_EquipmentMacro}" operation="add"/>
+         </do_for_each>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <!-- Find Stations where we can restock -->
+         <create_list name="$_FoundStations"/>
+         <run_script name="'jp.lib.FindStationToEquipAt'" result="$_FoundStations"/>
+
+         <!-- Message ~ Currently, there are no available stations where we could restock our desired equipment.
+                        Normally, this should not happen, but if it does, we will just get a message anyway. -->
+         <do_if value="$_FoundStations.count == 0">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 50}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 50}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <!-- When we have Deployables to buy check all Stations if they have the needed resources -->
+         <set_value name="$_RestockStation" exact="null"/>
+         <do_if value="$_DeployablesToBuyAmount gt 0">
+            <set_value name="$_StationWareCheckTable" exact="table[]"/>
+            <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToBuy">
+               <set_value name="$_StationWareCheckTable.{$_EquipmentMacro.ware}" exact="$_EquipmentAmount"/>
+            </do_for_each>
+            <do_for_each name="$_Station" in="$_FoundStations">
+               <do_if value="$_Station.hasresourcesfor.{$_StationWareCheckTable}">
+                  <set_value name="$_RestockStation" exact="$_Station"/>
+                  <break/>
+               </do_if>
+            </do_for_each>
+            <remove_value name="$_StationWareCheckTable"/>
+            <!-- Message ~ At present, all discovered stations are insufficient in the necessary resources to fabricate the required equipment.
+                           The intended strategy is to navigate to the nearest station,
+                           generate a restock order, and await the subsequent resource replenishment. -->
+            <do_if value="$_RestockStation" exact="null">
+               <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 51}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+               <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 51}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            </do_if>
+         </do_if>
+
+         <!-- Fall back to the first station if none of them has enough resources, or if we have nothing to buy. -->
+         <do_if value="$_RestockStation" exact="null">
+            <set_value name="$_RestockStation" exact="$_FoundStations.{1}"/>
+         </do_if>
+
+         <!-- Calculate the price for all the Deployables that we want to buy -->
+         <set_value name="$_TotalBuyPrice" exact="0Cr"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToBuy">
+            <set_value name="$_TotalBuyPrice" exact="($_RestockStation.buildprice.{$_EquipmentMacro.ware} * $_EquipmentAmount)Cr" operation="add"/>
+         </do_for_each>
+
+         <!-- Calculate the price for all the Deployables that we want to sell -->
+         <set_value name="$_TotalSellPrice" exact="0Cr"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToSell">
+            <set_value name="$_TotalSellPrice" exact="($_RestockStation.buildprice.{$_EquipmentMacro.ware} * $_EquipmentAmount)Cr" operation="add"/>
+         </do_for_each>
+
+         <!-- Calculate the total price for the restock -->
+         <set_value name="$_RestockPrice" exact="$_TotalBuyPrice - $_TotalSellPrice"/>
+
+         <!-- We lack the necessary funds to restock the desired equipment. -->
+         <do_if value="($_RestockPrice + $PURCHASE_THRESHOLD) gt $_Ship.owner.money">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 52}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 52}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <!-- Create the text for the logbook and the message -->
+
+         <run_script name="'jp.lib.GetFactionColorCode'" result="$_RestockStationOwnerColor">
+            <param name="FACTION" value="$_RestockStation.owner"/>
+         </run_script>
+
+         <run_script name="'jp.lib.GetFactionColorCode'" result="$_RestockStationSectorOwnerColor">
+            <param name="FACTION" value="$_RestockStation.sector.owner"/>
+         </run_script>
+
+         <run_script name="'jp.lib.GetFactionRelationColorCode'" result="$_RestockStationOwnerRelationColorCode">
+            <param name="FACTION_RELATION" value="$_Ship.owner.relation.{$_RestockStation.relationto.{$_Ship}}.uivalue"/>
+         </run_script>
+
+         <set_value name="$_LogText" exact="''"/>
+         <set_value name="$_HelpText" exact="''"/>
+
+         <!-- I'll go change my equipment:\nStation: %5%1 [%2]\033X\nRelation: %6%3\033X\nSector: %7%4\033X -->
+         <set_value name="$_HelpText" exact="{8888888, 56}.[$_RestockStation.knownname, $_RestockStation.idcode,
+                                            $_Ship.owner.relation.{$_RestockStation.relationto.{$_Ship}}.uivalue, $_RestockStation.sector.knownname,
+                                            $_RestockStationOwnerColor, $_RestockStationOwnerRelationColorCode, $_RestockStationSectorOwnerColor]"/>
+
+         <set_value name="$_LogText" exact="{8888888, 56}.[$_RestockStation.knownname, $_RestockStation.idcode,
+                                            $_Ship.owner.relation.{$_RestockStation.relationto.{$_Ship}}.uivalue, $_RestockStation.sector.knownname,
+                                            $_RestockStationOwnerColor, $_RestockStationOwnerRelationColorCode, $_RestockStationSectorOwnerColor]"/>
+
+
+         <!-- Equipment change cost: %1\n -->
+         <set_value name="$_HelpText" exact="{8888888, 57}.[$_RestockPrice.formatted.{'%.s %Cr'}]" operation="add"/>
+         <set_value name="$_LogText" exact="{8888888, 57}.[$_RestockPrice.formatted.{'%.s %Cr'}]" operation="add"/>
+
+         <!-- \nI sell equipment for %1 -->
+         <do_if value="$_DeployablesToSellAmount gt 0">
+            <set_value name="$_HelpText" exact="{8888888, 58}.[$_TotalSellPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $SHOW_MESSAGES ge 2 then 100 else 0"/>
+            <set_value name="$_LogText" exact="{8888888, 58}.[$_TotalSellPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $WRITE_TO_LOG ge 2 then 100 else 0"/>
+            <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToSell">
+               <set_value name="$_SellPrice" exact="(abs($_RestockStation.buildprice.{$_EquipmentMacro.ware} * $_EquipmentAmount))Cr"/>
+               <set_value name="$_HelpText" exact="'\n%1 x %2 ~ %3.'.[$_EquipmentAmount, $_EquipmentMacro.name, $_SellPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $SHOW_MESSAGES ge 3 then 100 else 0"/>
+               <set_value name="$_LogText" exact="'\n%1 x %2 ~ %3.'.[$_EquipmentAmount, $_EquipmentMacro.name, $_SellPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $WRITE_TO_LOG ge 3 then 100 else 0"/>
+            </do_for_each>
+            <set_value name="$_HelpText" exact="'\n'" operation="add"/>
+            <set_value name="$_LogText" exact="'\n'" operation="add"/>
+         </do_if>
+
+         <!-- \nI buy equipment for %1 -->
+         <do_if value="$_DeployablesToBuyAmount gt 0">
+            <set_value name="$_HelpText" exact="{8888888, 59}.[$_TotalBuyPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $SHOW_MESSAGES ge 2 then 100 else 0"/>
+            <set_value name="$_LogText" exact="{8888888, 59}.[$_TotalBuyPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $WRITE_TO_LOG ge 2 then 100 else 0"/>
+            <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_DeployablesToBuy">
+               <set_value name="$_BuyPrice" exact="(abs($_RestockStation.buildprice.{$_EquipmentMacro.ware} * $_EquipmentAmount))Cr"/>
+               <set_value name="$_HelpText" exact="'\n%1 x %2 ~ %3.'.[$_EquipmentAmount, $_EquipmentMacro.name, $_BuyPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $SHOW_MESSAGES ge 3 then 100 else 0"/>
+               <set_value name="$_LogText" exact="'\n%1 x %2 ~ %3.'.[$_EquipmentAmount, $_EquipmentMacro.name, $_BuyPrice.formatted.{'%.s %Cr'}]" operation="add" chance="if $WRITE_TO_LOG ge 3 then 100 else 0"/>
+            </do_for_each>
+            <set_value name="$_HelpText" exact="'\n'" operation="add" chance="if $SHOW_MESSAGES ge 2 then 100 else 0"/>
+            <set_value name="$_LogText" exact="'\n\n'" operation="add" chance="if $WRITE_TO_LOG ge 2 then 100 else 0"/>
+         </do_if>
+
+         <show_help custom="$RESTOCK_TITLE + '\n\n' + $_HelpText" position="1" allowclose="true" chance="if $SHOW_MESSAGES ge 1 then 100 else 0"/>
+         <write_to_logbook title="$RESTOCK_TITLE" text="'\n' + $_LogText" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG ge 1 then 100 else 0"/>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <add_build_to_modify_ship buildobject="$_Ship" object="$_RestockStation" ammo="$_ModifiedEquipmentTable" price="$_RestockPrice" immediate="true" result="$_ModifyResult"/>
+         <wait exact="1ms"/>
+
+         <!-- The process of creating the restock order has failed. -->
+         <do_if value="not $_ModifyResult">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 53}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 53}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <set_value name="$_Result" exact="'Success'"/>
+
+         <label name="FINISH_LBL"/>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_Result"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.RestockEquipment" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="EQUIPMENT_TABLE" default="table[]"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="GENERATE_TITLE" default="true"/>
+      <param name="RESTOCK_TITLE"  default="''"/>
+      <param name="EQUIPMENT_BUYSELL_TEXT" default="'TODO: EQUIPMENT_BUYSELL_TEXT'"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <set_value name="$_Result" exact="'Failed'"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$GENERATE_TITLE and $RESTOCK_TITLE == ''">
+         <set_value name="$RESTOCK_TITLE" exact="'%1 ~ %2 [%3]'.[$_DefaultOrderParamRef.name, $_Ship.knownname, $_Ship.idcode]"/>
+         <substitute_text source="$RESTOCK_TITLE" text="$RESTOCK_TITLE">
+            <replace string="'\033#FFCEFBA1# ~ Idle\033X'"   with="''"/>
+            <replace string="'\033#FFA95908##ASE-G\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##AE-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##AE-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##CP-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##CP-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##DVE-G\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##SD-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SD-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SE-S\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##SE-G\033X ~ '"  with="''"/>
+            <replace string="'\033#FFA95908##TSE-S\033X ~ '" with="''"/>
+            <replace string="'\033#FFA95908##TSE-G\033X ~ '" with="''"/>
+         </substitute_text>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$SHOW_MESSAGES" exact="@$_DefaultOrderParamRef.$SHOW_MESSAGES"/>
+      <set_value name="$WRITE_TO_LOG" exact="@$_DefaultOrderParamRef.$WRITE_TO_LOG"/>
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.RestockEquipment'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="RESUME_LBL"/>
+
+         <set_command command="command.resupply"/>
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <create_list name="$_FoundStations"/>
+         <run_script name="'jp.lib.FindStationToEquipAt'" result="$_FoundStations"/>
+
+         <!-- Currently, there are no available stations where we could restock our desired equipment. -->
+         <do_if value="$_FoundStations.count == 0">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 50}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 50}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <set_value name="$_WantedLoadoutTable" exact="table[]"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.missile.table">
+            <set_value name="$_WantedLoadoutTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.countermeasure.table">
+            <set_value name="$_WantedLoadoutTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$_Ship.ammostorage.deployable.table">
+            <set_value name="$_WantedLoadoutTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$EQUIPMENT_TABLE">
+            <set_value name="$_WantedLoadoutTable.{$_EquipmentMacro}" exact="$_EquipmentAmount"/>
+         </do_for_each>
+
+         <set_value name="$_StationWareCheckTable" exact="table[]"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$EQUIPMENT_TABLE">
+            <set_value name="$_StationWareCheckTable.{$_EquipmentMacro.ware}" exact="$_EquipmentAmount - $_Ship.ammostorage.{$_EquipmentMacro}.count"/>
+         </do_for_each>
+         <set_value name="$_RestockStation" exact="null"/>
+         <do_for_each name="$_Station" in="$_FoundStations">
+            <do_if value="$_Station.hasresourcesfor.{$_StationWareCheckTable}">
+               <set_value name="$_RestockStation" exact="$_Station"/>
+               <break/>
+            </do_if>
+         </do_for_each>
+         <remove_value name="$_StationWareCheckTable"/>
+
+         <!-- Currently, all discovered stations lack the necessary resources to manufacture the desired equipment. -->
+         <do_if value="$_RestockStation" exact="null">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 51}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 51}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <set_value name="$_RestockPrice" exact="0Cr"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$EQUIPMENT_TABLE">
+            <set_value name="$_RestockPrice" exact="($_RestockStation.buildprice.{$_EquipmentMacro.ware} * ($_EquipmentAmount - $_Ship.ammostorage.{$_EquipmentMacro}.count))Cr" operation="add"/>
+         </do_for_each>
+
+         <set_value name="$_NewEquipmentPrice" exact="0Cr"/>
+         <do_for_each name="$_EquipmentMacro" valuename="$_EquipmentAmount" in="$EQUIPMENT_TABLE">
+            <do_if value="($_EquipmentAmount - $_Ship.ammostorage.{$_EquipmentMacro}.count) gt 0">
+               <set_value name="$_NewEquipmentPrice" exact="($_RestockStation.buildprice.{$_EquipmentMacro.ware} * ($_EquipmentAmount - $_Ship.ammostorage.{$_EquipmentMacro}.count))Cr" operation="add"/>
+            </do_if>
+         </do_for_each>
+
+         <!-- We lack the necessary funds to restock the desired equipment. -->
+         <do_if value="($_RestockPrice + 100000Cr) gt $_Ship.owner.money">
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 52}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 52}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <!-- text like: I will proceed to sell placeables, which are worth %1. -->
+         <set_value name="$_Price" exact="abs($_NewEquipmentPrice)"/>
+         <show_help custom="$RESTOCK_TITLE + '\n\n' + $EQUIPMENT_BUYSELL_TEXT.[$_Price.formatted.{'%.s %Cr'}]" position="1" allowclose="true" chance="if $SHOW_MESSAGES ge 2 then 100 else 0"/>
+         <write_to_logbook title="$RESTOCK_TITLE" text="$EQUIPMENT_BUYSELL_TEXT.[$_Price.formatted.{'%.s %Cr'}]" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG ge 2 then 100 else 0"/>
+
+         <add_build_to_modify_ship buildobject="$_Ship" object="$_RestockStation" ammo="$_WantedLoadoutTable" price="$_RestockPrice" immediate="true" result="$_ModifyResult"/>
+         <wait exact="1ms"/>
+
+         <do_if value="not $_ModifyResult">
+            <set_value name="$_ResumeCounter" exact="if not $_ResumeCounter? then 0 else ($_ResumeCounter + 1)"/>
+            <do_if value="$_ResumeCounter le 3">
+               <wait min="1s" max="2s"/>
+               <resume label="RESUME_LBL"/>
+            </do_if>
+            <!-- The process of creating the restock order has failed. -->
+            <show_help custom="$RESTOCK_TITLE + '\n\n' + {8888888, 60} + '\n' + {8888888, 53}" position="1" allowclose="true" chance="if $SHOW_MESSAGES gt 0 then 100 else 0"/>
+            <write_to_logbook title="$RESTOCK_TITLE" text="{8888888, 60} + '\n' + {8888888, 53}" category="upkeep" interaction="showonmap" object="$_Ship" chance="if $WRITE_TO_LOG gt 0 then 100 else 0"/>
+            <resume label="FINISH_LBL"/>
+         </do_if>
+
+         <set_value name="$_Result" exact="'Success'"/>
+         
+         <label name="FINISH_LBL"/>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$_Result"/>
+
+      </actions>
+   </attention>
+
+   <on_abort>
+   </on_abort>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<aiscript name="jp.lib.SortByEstimatedTravelTime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aiscripts.xsd">
+
+   <params>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="LIST"    default="[]"/>
+      <param name="REVERSE" default="false"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <param name="debugchance" default="0"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </params>
+
+   <init>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$_Ship" exact="this.ship"/>
+      <set_value name="$_DefaultOrderParamRef" exact="if $_Ship.defaultorder.id == 'Assist' then $_Ship.commander.defaultorder else $_Ship.defaultorder"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <set_value name="$DEBUG" exact="@$_DefaultOrderParamRef.$DEBUG"/>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <do_if value="$DEBUG gt 0">
+         <set_value name="$_DebugFolderName" exact="@$_DefaultOrderParamRef.$DEBUG_FOLDER_NAME"/>
+         <set_value name="$_DebugScriptName" exact="'jp.lib.SortByEstimatedTravelTime'"/>
+         <set_value name="$_DebugFileName" exact="$_Ship.idcode + '.' + $_DebugScriptName + '.xml.log'"/>
+      </do_if>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </init>
+
+   <attention min="unknown">
+      <actions>
+
+         <label name="INIT_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <set_command_action commandaction="commandaction.calculating"/>
+
+         <do_if value="@$LIST.{1}.distanceto.{$_Ship}">
+            <create_list name="$_SectorTravelTimes"/>
+            <do_for_each name="$_ListEntry" in="$LIST">
+               <estimate_travel_time ship="$_Ship" start="$_Ship" target="$_ListEntry" result="$_TravelTime"/>
+               <append_to_list name="$_SectorTravelTimes" exact="[$_ListEntry, $_TravelTime]"/>
+            </do_for_each>
+            <sort_list list="$_SectorTravelTimes" sortbyvalue="loop.element.{2}"/>
+            <clear_list list="$LIST"/>
+            <do_if value="$_SectorTravelTimes.{1}.{1}.isclass.{class.sector}">
+               <do_for_each name="$_Sector" in="$_SectorTravelTimes" reverse="true">
+                  <do_if value="$_Sector.{1} == $_Ship.sector">
+                     <remove_from_list name="$_SectorTravelTimes" exact="$_Sector"/>
+                     <append_to_list name="$LIST" exact="$_Ship.sector"/>
+                     <break/>
+                  </do_if>
+               </do_for_each>
+            </do_if>
+            <do_for_each name="$_SectorTravelTime" in="$_SectorTravelTimes">
+               <append_to_list name="$LIST" exact="$_SectorTravelTime.{1}"/>
+            </do_for_each>
+         </do_if>
+
+         <do_if value="$REVERSE">
+            <create_list name="$_ReversedList"/>
+            <do_for_each name="$_Entry" in="$LIST" reverse="true">
+               <append_to_list name="$_ReversedList" exact="$_Entry"/>
+            </do_for_each>
+            <clear_list list="$LIST"/>
+            <append_list_elements name="$LIST" other="$_ReversedList"/>
+         </do_if>
+
+         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+         <label name="END_LBL"/>
+         <do_if value="$DEBUG gt 0">
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+            <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+         </do_if>
+
+         <return value="$LIST"/>
+
+      </actions>
+   </attention>
+
+</aiscript><?xml version="1.0" encoding="utf-8"?>
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd">
+
+   <add sel="//params">
+      <param name="IDLE_RETURN_HOME"  type="internal" default="false"/>
+   </add>
+
+   <add sel="//create_order[@name='$dockorder'][@object='this.assignedcontrolled']">
+      <param name="IDLE_RETURN_HOME" value="$IDLE_RETURN_HOME"/>
+   </add>
+
+   <add sel="//interrupts">
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'Cancel_IdleReturnHome'"/>
+            <check_value value="$IDLE_RETURN_HOME == true"/>
+         </conditions>
+         <actions>
+            <cancel_order order="this.ship.order"/>
+         </actions>
+      </handler>
+   </add>
+
+</diff><?xml version="1.0" encoding="utf-8"?>
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd">
+
+   <add sel="//params">
+      <param name="IDLE_RETURN_HOME"  type="internal" default="false"/>
+   </add>
+
+   <add sel="//interrupts">
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'Cancel_IdleReturnHome'"/>
+            <check_value value="$IDLE_RETURN_HOME == true"/>
+         </conditions>
+         <actions>
+            <cancel_order order="this.ship.order"/>
+         </actions>
+      </handler>
+   </add>
+
+</diff><?xml version="1.0" encoding="utf-8"?>
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd">
+
+   <add sel="//params">
+      <param name="IDLE_RETURN_HOME"  type="internal" default="false"/>
+   </add>
+
+   <add sel="//interrupts">
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'Cancel_IdleReturnHome'"/>
+            <check_value value="$IDLE_RETURN_HOME == true"/>
+         </conditions>
+         <actions>
+            <cancel_order order="this.ship.order"/>
+         </actions>
+      </handler>
+   </add>
+
+</diff><?xml version="1.0" encoding="utf-8"?>
+
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://x4dynlib.access.ly\libraries\aiscripts.xsd">
+
+   <add sel="//params">
+      <param name="IDLE_RETURN_HOME"  type="internal" default="false"/>
+   </add>
+
+   <add sel="//interrupts">
+      <handler>
+         <conditions>
+            <event_object_signalled object="this.ship" param="'Cancel_IdleReturnHome'"/>
+            <check_value value="$IDLE_RETURN_HOME == true"/>
+         </conditions>
+         <actions>
+            <cancel_order order="this.ship.order"/>
+         </actions>
+      </handler>
+   </add>
+
+</diff>#ScriptLibrary
+
+v1.0.0
+~ Initial release
+
+v1.0.1
+~ Added: jp.lib.FindStationToEquipAt.xml
+~ Added: Some often used translations.
+~ Fixed: The 'IdleReturnHome' feature was not functioning when no option was selected. It now defaults to 'Idle: Move to?' using either the position and sector stored in their settings or the position and sector where the ship initiated the script.
+~ Fixed: The script that cancels the Idle task now removes only the orders generated by the Idle order itself.
+~ Fixed: The 'Find Station' function now performs a search for stations only when enabled.
+~ Changed: The 'Find Station' function now organizes its findings by estimated travel time.
+~ Changed: "jp.lib.Restock" is now "jp.lib.RestockEquipment," with some improvements to its logic.
+~ Updated: Several minor enhancements have been made to the code and translations.
+
+v1.0.2
+~ Added: jp.lib.ConvertARGBtoHex.xml
+~ Added: jp.lib.GetFactionColorCode.xml
+~ Added: jp.lib.GetFactionRelationColorCode.xml
+~ Added: A variable has been added to store the ship's initial position/sector when the script is activated. This ensures that the ship will return to its starting position/sector when no Idle option is selected. This addition also needs to be implemented in each script that utilizes IdleReturnHome.
+
+v1.0.3 -- Current Published Version
+~ Added: Czech translations
+~ Added: jp.lib.MoveThroughGate.xml - Simple implementation of the moving through a gate, accelerator or superhighway.
+~ Added: jp.lib.MoveToPosition.xml - Simple implementation of the MoveToPosition to get the ability to change parameters like "uselocalhighway" or "traveldrive".
+~ Added: jp.lib.RestockDeployables.xml - This function limits the number of deployables that a ship can store before swapping them out, sells existing deployables to create room for new ones, or it can be used exclusively for selling deployables.
+~ Updated: jp.lib.MoveToSector.xml - S and M ships now correctly utilize the Ring Highway. L and XL ships currently use the Gates by flying through them, similar to the way S and M ships do.
+~ Updated: jp.lib.SortByEstimatedTravelTime.xml - when the input is a list of Sectors, the sector where we currently are will always be prioritized and placed first in the list.
+~ Updated: Several code changes inside jp.lib.MoveToPosition.xml, jp.lib.MoveToObject.xml and jp.lib.MoveToSector.xml to make them more efficient and stable.
+~ Updated: Several code cleanup and translations changes.
+
+v1.0.4 -- Current Development Version<?xml version="1.0" encoding="utf-8"?>
+
+<content id="JP_ScriptLibrary" name="JP_ScriptLibrary" description="This is a library of scripts utilized by JP mods." author="JanPanthera" version="103" date="2023-07-19" save="0" enabled="1">
+   <text language="7"  name="JP_ScriptLibrary" description="Это библиотека скриптов, используемых модами JP."/>
+   <text language="33" name="JP_ScriptLibrary" description="Il s'agit d'une bibliothèque de scripts utilisés par les mods JP."/>
+   <text language="34" name="JP_ScriptLibrary" description="Esta es una biblioteca de scripts utilizada por los mods JP."/>
+   <text language="39" name="JP_ScriptLibrary" description="Questa è una biblioteca di script utilizzata dai mod JP."/>
+   <text language="42" name="JP_ScriptLibrary" description="To jest biblioteka skryptów wykorzystywanych przez modyfikacje JP."/>
+   <text language="44" name="JP_ScriptLibrary" description="This is a library of scripts utilized by JP mods."/>
+   <text language="48" name="JP_ScriptLibrary" description="To jest biblioteka skryptów wykorzystywanych przez modyfikacje JP."/>
+   <text language="49" name="JP_ScriptLibrary" description="Dies ist eine Bibliothek von Skripten, die von JP-Mods genutzt werden."/>
+   <text language="55" name="JP_ScriptLibrary" description="Esta é uma biblioteca de scripts utilizada por mods JP."/>
+   <text language="81" name="JP_ScriptLibrary" description="これはJPのmodによって使用されるスクリプトのライブラリーです。"/>
+   <text language="82" name="JP_ScriptLibrary" description="이것은 JP 모드에서 사용하는 스크립트 라이브러리입니다."/>
+   <text language="86" name="JP_ScriptLibrary" description="Simplified Chinese: 这是JP模组使用的脚本库。"/>
+   <text language="88" name="JP_ScriptLibrary" description="Traditional Chinese: 這是JP模組使用的腳本庫。"/>
+</content><?xml version="1.0" encoding="utf-8"?>
+
+<icons>
+   <icon name="order_jp_lib_movetoposition" texture="assets\fx\gui\textures\order\order_movewait.tga" height="32" width="32"></icon>
+   <icon name="order_jp_lib_movetoobject" texture="assets\fx\gui\textures\order\order_movetoobject.tga" height="32" width="32"></icon>
+   <icon name="order_jp_lib_movetosector" texture="assets\fx\gui\textures\order\order_movewait.tga" height="32" width="32"></icon>
+   <icon name="order_jp_lib_movethroughgate" texture="assets\fx\gui\textures\order\order_movewait.tga" height="32" width="32"></icon>
+   <icon name="order_jp_lib_idlereturnhome" texture="assets\fx\gui\textures\order\order_wait.tga" height="32" width="32"></icon>
+</icons><?xml version="1.0" encoding="utf-8" ?>
+
+<mdscript name="JP_ScriptLibrary_MD" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+   <cues>
+
+      <cue name="SL_Setup_MD" instantiate="true">
+         <conditions>
+            <check_any>
+               <event_game_started/>
+               <event_game_loaded/>
+            </check_any>
+         </conditions>
+         <actions>
+
+            <set_value name="$DEBUG" exact="0"/>
+            <do_if value="$DEBUG gt 0">
+               <set_value name="$_DebugFolderName" exact="'JP_ScriptLibrary.logs'"/>
+               <set_value name="$_DebugScriptName" exact="'SL_Setup_MD'"/>
+               <set_value name="$_DebugFileName" exact="'sl.Setup.md.xml.log'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+            </do_if>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <!-- group ~ $SL_PlayerShips -->
+            <find_ship_by_true_owner groupname="global.$SL_PlayerShips" space="player.galaxy" faction="faction.player" trueowner="faction.player" multiple="true" append="true"/>
+
+            <!-- table[] ~ key = $_Ship, value = [$_IdleStartTime] -->
+            <set_value name="global.$SL_IdleShips" exact="table[]" chance="(if not global.$SL_IdleShips? then 100 else 0)"/>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <do_if value="$DEBUG gt 0">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+
+         </actions>
+      </cue>
+
+      <cue name="SL_DebugInfo_MD" instantiate="false" checkinterval="1s">
+         <actions>
+
+            <set_value name="$DEBUG" exact="md.JP_ScriptLibrary_MD.SL_Setup_MD.$DEBUG"/>
+            <do_if value="$DEBUG gt 0">
+               <set_value name="$_DebugFolderName" exact="'JP_ScriptLibrary.logs'"/>
+               <set_value name="$_DebugScriptName" exact="'SL_DebugInfo_MD'"/>
+               <set_value name="$_DebugFileName" exact="'sl.Debug.md.xml.log'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+            </do_if>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <do_if value="$DEBUG gt 0 and @global.$SL_PlayerShips != null">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'global.$SL_PlayerShips.count %1'.[@global.$SL_PlayerShips.count]"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'"/>
+               <do_for_each name="$_Ship" in="global.$SL_PlayerShips">
+                  <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'$_Ship: %1 [%2]'.[@$_Ship.knownname, @$_Ship.idcode]"/>
+               </do_for_each>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+
+            <do_if value="$DEBUG gt 0 and @global.$SL_IdleShips != null">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'global.$SL_IdleShips.keys.count %1'.[@global.$SL_IdleShips.keys.count]"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'"/>
+               <do_for_each name="$_Ship"  valuename="$_IdleStartTime" in="global.$SL_IdleShips">
+                  <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'$_Ship: %1 [%2] ~ %3'.[@$_Ship.knownname, @$_Ship.idcode, @$_IdleStartTime]"/>
+               </do_for_each>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <do_if value="$DEBUG gt 0">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+
+         </actions>
+      </cue>
+
+      <cue name="SL_ManageIdleReturnHome_MD" instantiate="true" checkinterval="1s">
+         <conditions>
+            <check_value value="@global.$SL_IdleShips.keys.count"/>
+         </conditions>
+         <actions>
+
+            <set_value name="$DEBUG" exact="md.JP_ScriptLibrary_MD.SL_Setup_MD.$DEBUG"/>
+            <do_if value="$DEBUG gt 0">
+               <set_value name="$_DebugFolderName" exact="'JP_ScriptLibrary.logs'"/>
+               <set_value name="$_DebugScriptName" exact="'SL_ManageIdleReturnHome_MD'"/>
+               <set_value name="$_DebugFileName" exact="'sl.ManageIdleReturnHome.md.xml.log'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'" append="false"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_START ~~' + '\n'"/>
+            </do_if>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <do_for_each name="$_Ship" valuename="$_IdleStartTime" in="global.$SL_IdleShips" reverse="true">
+               <set_value name="$_IdleOrderPresent" exact="false"/>
+               <do_for_each name="$_Order" in="$_Ship.orders">
+                  <do_if value="$_Order.id == 'JP_lib_IdleReturnHome'">
+                     <set_value name="$_IdleOrderPresent" exact="true"/>
+                     <break/>
+                  </do_if>
+               </do_for_each>
+               <set_value name="$_IdleTime" exact="if $_Ship.defaultorder.id == 'Assist' 
+                                                            then @$_Ship.commander.defaultorder.$IDLE_TIME
+                                                            else @$_Ship.defaultorder.$IDLE_TIME"/>
+               <do_if value="$_IdleOrderPresent and ((player.age - $_IdleStartTime) lt $_IdleTime)">
+                  <continue/>
+               </do_if>
+               <signal_objects object="$_Ship" param="'Cancel_IdleReturnHome'"/>
+               <remove_value name="global.$SL_IdleShips.{$_Ship}"/>
+               <substitute_text source="$_Ship.knownname" text="$_ResultName">
+                  <replace string="'\033#FFCEFBA1# ~ Idle\033X'" with="''"/>
+               </substitute_text>
+               <set_object_name object="$_Ship" name="$_ResultName"/>
+            </do_for_each>
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <do_if value="$DEBUG gt 0">
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'[' + player.systemtime.{'%F - %X'} + '] ' + '~~ ' + $_DebugScriptName + '.xml ~ SCRIPT_END ~~'"/>
+               <debug_to_file directory="$_DebugFolderName" name="$_DebugFileName" text="'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'"/>
+            </do_if>
+
+         </actions>
+      </cue>
+
+   </cues>
+</mdscript><?xml version="1.0" encoding="UTF-8"?>
+<!-- Russian ~~ Русский 
+thanks to alexalsp ~ https://apocalypse.moy.su
+for some of the translations
+-->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Врата?</t>
+      <t id="2">Активные врата?</t>
+      <t id="3">Неактивные врата?</t>
+      <t id="4">Ускорители?</t>
+      <t id="5">Активные ускорители?</t>
+      <t id="6">Неактивные ускорители?</t>
+      <t id="7">Супермагистрали?</t>
+      <t id="8">Активные супермагистрали?</t>
+      <t id="9">Неактивные супермагистрали?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Станции?</t>
+      <t id="11">Порты?</t>
+      <t id="12">Верфи?</t>
+      <t id="13">Доки оборудования?</t>
+      <t id="14">Торговые станции?</t>
+      <t id="15">Пиратские базы?</t>
+      <t id="16">Станции переработки металлолома?</t>
+      <t id="17">Защищенные платформы?</t>
+      <t id="18">ШК Фракций?</t>
+      <t id="19">Фабрики?</t>
+      <t id="20">Стройплощадки?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Сектора без владельцев?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">В режиме ожидания</t>
+      <t id="41">Переместиться в сектор</t>
+      <t id="42">Переместиться в позицию</t>
+      <t id="43">Переместиться к объекту</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">В настоящее время нет доступных станций, где мы могли бы пополнить запасы желаемого оборудования.</t>
+      <t id="51">В настоящее время все доступные станции не имеют необходимых ресурсов для производства нужного оборудования.\nЯ отправлюсь к ближайшей станции, сделаю запрос на пополнение запасов, а затем буду ждать следующее пополнение ресурсов.</t>
+      <t id="52">У нас не хватает необходимых средств для пополнения запасов желаемого оборудования.</t>
+      <t id="53">Процесс создания заказа на пополнение запасов не удался.</t>
+      <t id="54">Заказ на пополнение запасов оборудования не удался. Больше деталей доступно в журнале.</t>
+      <t id="55">Я перейду в режим ожидания и попробую снова позже.</t>
+      <t id="56">Я пойду поменяю свое оборудование в:\nСтанция: %5%1 [%2]\033X\nОтношение: %6%3\033X\nСектор: %7%4\033X\n</t>
+      <t id="57">\nСтоимость изменения оборудования: %1\n</t>
+      <t id="58">\nЯ продаю оборудование за %1</t>
+      <t id="59">\nЯ покупаю оборудование за %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Сбой смены оборудования\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Бездействие</t>
+      <t id="81">Бездействие: Переместиться к?</t>
+      <t id="82">Куда переместиться?</t>
+      <t id="83">Бездействие: Следовать?</t>
+      <t id="84">За кем следовать?</t>
+      <t id="85">Бездействие: Стыковка?</t>
+      <t id="86">Поиск станции?</t>
+      <t id="87">К какому пристыковаться?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Показать сообщения?</t>
+      <t id="91">Записать в журнал?</t>
+      <t id="92">Добавить тег задания?</t>
+      <t id="93">Сохранить настройки задания?</t>
+      <t id="94">Сбросить настройки задания?</t>
+      <t id="95">Настройки задания сохранены.</t>
+      <t id="96">Настройки задания сброшены.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- French ~~ Français -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Portes de saut ?</t>
+      <t id="2">Portes de saut actives ?</t>
+      <t id="3">Portes de saut inactives ?</t>
+      <t id="4">Accélérateurs ?</t>
+      <t id="5">Accélérateurs actifs ?</t>
+      <t id="6">Accélérateurs inactifs ?</t>
+      <t id="7">Super autoroutes ?</t>
+      <t id="8">Super autoroutes actives ?</t>
+      <t id="9">Super autoroutes inactives ?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stations ?</t>
+      <t id="11">Chantiers navals ?</t>
+      <t id="12">Cale sèche ?</t>
+      <t id="13">Docks d'équipement ?</t>
+      <t id="14">Stations de commerce ?</t>
+      <t id="15">Bases de pirates ?</t>
+      <t id="16">Installations de traitement des déchets ?</t>
+      <t id="17">Stations de défense ?</t>
+      <t id="18">Quartiers généraux de faction ?</t>
+      <t id="19">Usines?</t>
+      <t id="20">Chantiers de construction?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Secteurs sans propriétaire?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Inactif</t>
+      <t id="41">Se déplacer vers le secteur</t>
+      <t id="42">Se déplacer vers la position</t>
+      <t id="43">Se déplacer vers l'objet</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Actuellement, il n'y a pas de stations disponibles où nous pourrions réapprovisionner notre équipement souhaité.</t>
+      <t id="51">Actuellement, toutes les stations disponibles manquent des ressources nécessaires pour fabriquer l'équipement nécessaire.\nJe vais à la station la plus proche, fais une demande de réapprovisionnement, puis attends le prochain réapprovisionnement en ressources.</t>
+      <t id="52">Nous manquons des fonds nécessaires pour réapprovisionner l'équipement souhaité.</t>
+      <t id="53">Le processus de création de la commande de réapprovisionnement a échoué.</t>
+      <t id="54">La commande de réapprovisionnement d'équipement a échoué. Plus de détails sont disponibles dans le journal de bord.</t>
+      <t id="55">Je vais passer en mode veille et réessayer plus tard.</t>
+      <t id="56">Je vais changer mon équipement à:\nStation: %5%1 [%2]\033X\nRelation: %6%3\033X\nSecteur: %7%4\033X\n</t>
+      <t id="57">\nCoût du changement d'équipement : %1\n</t>
+      <t id="58">\nJe vends de l'équipement pour %1</t>
+      <t id="59">\nJ'achète de l'équipement pour %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Échec du changement d'équipement\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Temps d'inactivité</t>
+      <t id="81">Inactif: Déplacer vers?</t>
+      <t id="82">Où déplacer?</t>
+      <t id="83">Inactif: Suivre?</t>
+      <t id="84">Qui suivre?</t>
+      <t id="85">Inactif: Accostage?</t>
+      <t id="86">Trouver une station?</t>
+      <t id="87">Où accoster?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Afficher les messages?</t>
+      <t id="91">Écrire dans le journal de bord?</t>
+      <t id="92">Ajouter une balise de commande?</t>
+      <t id="93">Sauvegarder les paramètres de commande?</t>
+      <t id="94">Réinitialiser les paramètres de commande?</t>
+      <t id="95">Paramètres de commande sauvegardés.</t>
+      <t id="96">Paramètres de commande réinitialisés.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Spanish ~~ Español -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">¿Portales de salto?</t>
+      <t id="2">¿Portales de salto activos?</t>
+      <t id="3">¿Portales de salto inactivos?</t>
+      <t id="4">¿Aceleradores?</t>
+      <t id="5">¿Aceleradores activos?</t>
+      <t id="6">¿Aceleradores inactivos?</t>
+      <t id="7">¿Superautopistas?</t>
+      <t id="8">¿Superautopistas activas?</t>
+      <t id="9">¿Superautopistas inactivas?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">¿Estaciones?</t>
+      <t id="11">¿Astilleros?</t>
+      <t id="12">¿Varaderos?</t>
+      <t id="13">¿Muelles de equipo?</t>
+      <t id="14">¿Estaciones de comercio?</t>
+      <t id="15">¿Bases piratas?</t>
+      <t id="16">¿Instalaciones de procesamiento de chatarra?</t>
+      <t id="17">¿Estaciones de defensa?</t>
+      <t id="18">¿Sedes de facciones?</t>
+      <t id="19">¿Fábricas?</t>
+      <t id="20">¿Sitios de construcción?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">¿Sectores sin dueño?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Inactivo</t>
+      <t id="41">Moverse al sector</t>
+      <t id="42">Moverse a la posición</t>
+      <t id="43">Moverse al objeto</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Actualmente, no hay estaciones disponibles donde podríamos reabastecer nuestro equipo deseado.</t>
+      <t id="51">Actualmente, todas las estaciones disponibles carecen de los recursos necesarios para fabricar el equipo necesario.\nIré a la estación más cercana, haré una solicitud de reabastecimiento, y luego esperaré la próxima reposición de recursos.</t>
+      <t id="52">Nos faltan los fondos necesarios para reabastecer el equipo deseado.</t>
+      <t id="53">El proceso de creación del pedido de reabastecimiento ha fallado.</t>
+      <t id="54">El pedido de reabastecimiento de equipo ha fallado. Más detalles están disponibles en el registro.</t>
+      <t id="55">Voy a cambiar a modo inactivo y lo intentaré de nuevo más tarde.</t>
+      <t id="56">Voy a cambiar mi equipo en:\nEstación: %5%1 [%2]\033X\nRelación: %6%3\033X\nSector: %7%4\033X\n</t>
+      <t id="57">\nCosto de cambio de equipo: %1\n</t>
+      <t id="58">\nVendo equipo por %1</t>
+      <t id="59">\nCompro equipo por %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Fallo en el cambio de equipo\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Tiempo de inactividad</t>
+      <t id="81">Inactivo: ¿Mover a?</t>
+      <t id="82">¿A dónde mover?</t>
+      <t id="83">Inactivo: ¿Seguir a?</t>
+      <t id="84">¿A quién seguir?</t>
+      <t id="85">Inactivo: ¿Acoplamiento?</t>
+      <t id="86">¿Encontrar una Estación?</t>
+      <t id="87">¿Dónde acoplar?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">¿Mostrar mensajes?</t>
+      <t id="91">¿Escribir en el libro de registro?</t>
+      <t id="92">¿Agregar etiqueta de orden?</t>
+      <t id="93">¿Guardar configuraciones de orden?</t>
+      <t id="94">¿Restablecer configuraciones de orden?</t>
+      <t id="95">Configuraciones de orden guardadas.</t>
+      <t id="96">Configuraciones de orden restablecidas.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Italian ~~ Italiano -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Portali di salto?</t>
+      <t id="2">Portali di salto attivi?</t>
+      <t id="3">Portali di salto inattivi?</t>
+      <t id="4">Acceleratori?</t>
+      <t id="5">Acceleratori attivi?</t>
+      <t id="6">Acceleratori inattivi?</t>
+      <t id="7">Superstrade?</t>
+      <t id="8">Superstrade attive?</t>
+      <t id="9">Superstrade inattive?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stazioni?</t>
+      <t id="11">Moli?</t>
+      <t id="12">Cantieri navali?</t>
+      <t id="13">Moli di attrezzatura?</t>
+      <t id="14">Stazioni di commercio?</t>
+      <t id="15">Basi dei pirati?</t>
+      <t id="16">Impianti di lavorazione dei rottami?</t>
+      <t id="17">Stazioni di difesa?</t>
+      <t id="18">Quartier generale delle fazioni?</t>
+      <t id="19">Fabbriche?</t>
+      <t id="20">Cantieri edili?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Settori senza proprietario?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Inattivo</t>
+      <t id="41">Muoversi nel settore</t>
+      <t id="42">Muoversi nella posizione</t>
+      <t id="43">Muoversi verso l'oggetto</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Al momento, non ci sono stazioni disponibili dove potremmo rifornire la nostra attrezzatura desiderata.</t>
+      <t id="51">Al momento, tutte le stazioni disponibili mancano delle risorse necessarie per produrre l'attrezzatura necessaria.\nAndrò alla stazione più vicina, farò una richiesta di rifornimento, e poi aspetterò il prossimo rifornimento di risorse.</t>
+      <t id="52">Manciamo dei fondi necessari per rifornire l'attrezzatura desiderata.</t>
+      <t id="53">Il processo di creazione dell'ordine di rifornimento è fallito.</t>
+      <t id="54">L'ordine di rifornimento di attrezzature è fallito. Più dettagli sono disponibili nel registro.</t>
+      <t id="55">Passerò in modalità inattiva e proverò di nuovo più tardi.</t>
+      <t id="56">Andrò a cambiare la mia attrezzatura a:\nStazione: %5%1 [%2]\033X\nRelazione: %6%3\033X\nSettore: %7%4\033X\n</t>
+      <t id="57">\nCosto del cambio di attrezzatura: %1\n</t>
+      <t id="58">\nVendo attrezzatura per %1</t>
+      <t id="59">\nCompro attrezzatura per %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Fallimento nel cambio di equipaggiamento\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Tempo di inattività</t>
+      <t id="81">Inattivo: Spostarsi a?</t>
+      <t id="82">Dove spostarsi?</t>
+      <t id="83">Inattivo: Seguire?</t>
+      <t id="84">Chi seguire?</t>
+      <t id="85">Inattivo: Attraccare?</t>
+      <t id="86">Trovare una Stazione?</t>
+      <t id="87">Dove attraccare?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Mostrare i messaggi?</t>
+      <t id="91">Scrivere sul registro di bordo?</t>
+      <t id="92">Aggiungere il tag dell'ordine?</t>
+      <t id="93">Salvare le impostazioni dell'ordine?</t>
+      <t id="94">Reset delle impostazioni dell'ordine?</t>
+      <t id="95">Impostazioni dell'ordine salvate.</t>
+      <t id="96">Impostazioni dell'ordine ripristinate.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Czech ~~ čeština -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Skokové brány?</t>
+      <t id="2">Aktivní skokové brány?</t>
+      <t id="3">Neaktivní skokové brány?</t>
+      <t id="4">Akcelerátory?</t>
+      <t id="5">Aktivní akcelerátory?</t>
+      <t id="6">Neaktivní akcelerátory?</t>
+      <t id="7">Dálnice?</t>
+      <t id="8">Aktivní dálnice?</t>
+      <t id="9">Neaktivní dálnice?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stanice?</t>
+      <t id="11">Přístavy?</t>
+      <t id="12">Loděnice?</t>
+      <t id="13">Doky pro vybavení?</t>
+      <t id="14">Obchodní stanice?</t>
+      <t id="15">Pirátské základny?</t>
+      <t id="16">Zařízení pro zpracování odpadu?</t>
+      <t id="17">Obranné stanice?</t>
+      <t id="18">Hlavní stanice frakcí?</t>
+      <t id="19">Továrny?</t>
+      <t id="20">Staveniště?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Sektory bez vlastníka?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Nečinný</t>
+      <t id="41">Přesunout do sektoru</t>
+      <t id="42">Přesunout na pozici</t>
+      <t id="43">Přesunout k objektu</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">V současné době nejsou k dispozici žádné stanice, kde bychom mohli doplnit naše požadované vybavení.</t>
+      <t id="51">V současné době všechny dostupné stanice postrádají potřebné zdroje pro výrobu potřebného vybavení.\nOdeberu se na nejbližší stanici, zadám požadavek na doplnění zásob a poté budu čekat na další doplnění zdrojů.</t>
+      <t id="52">Nemáme dostatek finančních prostředků na doplnění požadovaného vybavení.</t>
+      <t id="53">Proces vytváření objednávky na doplnění zásob selhal.</t>
+      <t id="54">Objednávka na doplnění vybavení selhala. Více detailů je k dispozici v palubním deníku.</t>
+      <t id="55">Přepnu se do nečinného režimu a zkusím to později znovu.</t>
+      <t id="56">Půjdu vyměnit své vybavení na:\nStanice: %5%1 [%2]\033X\nVztah: %6%3\033X\nSektor: %7%4\033X\n</t>
+      <t id="57">\nNáklady na výměnu vybavení: %1\n</t>
+      <t id="58">\nProdávám vybavení za %1</t>
+      <t id="59">\nKupuji vybavení za %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Selhání při výměně vybavení\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Doba nečinnosti</t>
+      <t id="81">Nečinný: Přesunout na?</t>
+      <t id="82">Kam se přesunout?</t>
+      <t id="83">Nečinný: Sledovat?</t>
+      <t id="84">Koho sledovat?</t>
+      <t id="85">Nečinný: Dokování?</t>
+      <t id="86">Najít stanici?</t>
+      <t id="87">Kde dokovat?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Zobrazit zprávy?</t>
+      <t id="91">Zapsat do palubního deníku?</t>
+      <t id="92">Přidat štítek k objednávce?</t>
+      <t id="93">Uložit nastavení objednávky?</t>
+      <t id="94">Resetovat nastavení objednávky?</t>
+      <t id="95">Nastavení objednávky uloženo.</t>
+      <t id="96">Nastavení objednávky resetováno.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- English ~~ English-->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Jump Gates?</t>
+      <t id="2">Active Jump Gates?</t>
+      <t id="3">Inactive Jump Gates?</t>
+      <t id="4">Accelerators?</t>
+      <t id="5">Active Accelerators?</t>
+      <t id="6">Inactive Accelerators?</t>
+      <t id="7">Superhighways?</t>
+      <t id="8">Active Superhighways?</t>
+      <t id="9">Inactive Superhighways?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stations?</t>
+      <t id="11">Wharfs?</t>
+      <t id="12">Shipyards?</t>
+      <t id="13">Equipment Docks?</t>
+      <t id="14">Trading Stations?</t>
+      <t id="15">Pirate Bases?</t>
+      <t id="16">Scrap Processing Facilities?</t>
+      <t id="17">Defense Stations?</t>
+      <t id="18">Faction Headquarters?</t>
+      <t id="19">Factories?</t>
+      <t id="20">Construction Sites?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Ownerless Sectors?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Idle</t>
+      <t id="41">Move to Sector</t>
+      <t id="42">Move to Position</t>
+      <t id="43">Move to Object</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Currently, there are no available stations where we could restock our desired equipment.</t>
+      <t id="51">Currently, all available stations lack the required resources to manufacture the necessary equipment.\nI will go to the nearest station, place a request for restocking, and then await the next resource replenishment.</t>
+      <t id="52">We lack the necessary funds to restock the desired equipment.</t>
+      <t id="53">The process of creating the restock order has failed.</t>
+      <t id="54">The restock equipment order has failed. More detail is available in the logbook.</t>
+      <t id="55">I will switch to idle mode and try again later.</t>
+      <t id="56">I'll go change my equipment at:\nStation: %5%1 [%2]\033X\nRelation: %6%3\033X\nSector: %7%4\033X\n</t>
+      <t id="57">\nEquipment change cost: %1\n</t>
+      <t id="58">\nI sell equipment for %1</t>
+      <t id="59">\nI buy equipment for %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Equipment Change Failure\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Idle Time</t>
+      <t id="81">Idle: Move to?</t>
+      <t id="82">Where to move?</t>
+      <t id="83">Idle: Follow?</t>
+      <t id="84">Who to follow?</t>
+      <t id="85">Idle: Docking?</t>
+      <t id="86">Find a Station?</t>
+      <t id="87">Where to dock?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Show messages?</t>
+      <t id="91">Write to logbook?</t>
+      <t id="92">Add Order tag?</t>
+      <t id="93">Save Order Settings?</t>
+      <t id="94">Reset Order Settings?</t>
+      <t id="95">Order settings saved.</t>
+      <t id="96">Order settings reset.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Polish ~~ Polski -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Bramy skokowe?</t>
+      <t id="2">Aktywne bramy skokowe?</t>
+      <t id="3">Nieaktywne bramy skokowe?</t>
+      <t id="4">Akceleratory?</t>
+      <t id="5">Aktywne akceleratory?</t>
+      <t id="6">Nieaktywne akceleratory?</t>
+      <t id="7">Super autostrady?</t>
+      <t id="8">Aktywne super autostrady?</t>
+      <t id="9">Nieaktywne super autostrady?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stacje?</t>
+      <t id="11">Doki?</t>
+      <t id="12">Stocznie?</t>
+      <t id="13">Doki sprzętowe?</t>
+      <t id="14">Stacje handlowe?</t>
+      <t id="15">Bazy piratów?</t>
+      <t id="16">Zakłady przetwarzania złomu?</t>
+      <t id="17">Stacje obronne?</t>
+      <t id="18">Siedziby frakcji?</t>
+      <t id="19">Fabryki?</t>
+      <t id="20">Plac budowy?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Sektory bez właściciela?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Bezczynny</t>
+      <t id="41">Przenieś do sektora</t>
+      <t id="42">Przenieś na pozycję</t>
+      <t id="43">Przenieś do obiektu</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Obecnie nie ma dostępnych stacji, na których moglibyśmy uzupełnić zapas naszego pożądanego sprzętu.</t>
+      <t id="51">Obecnie wszystkie dostępne stacje nie mają wymaganych zasobów do wyprodukowania niezbędnego sprzętu.\nUdam się do najbliższej stacji, złożę prośbę o uzupełnienie zapasów, a następnie poczekam na następne uzupełnienie zasobów.</t>
+      <t id="52">Brakuje nam niezbędnych funduszy na uzupełnienie zapasów pożądanego sprzętu.</t>
+      <t id="53">Proces tworzenia zamówienia na uzupełnienie zapasów nie powiódł się.</t>
+      <t id="54">Zamówienie na uzupełnienie zapasów sprzętu nie powiodło się. Więcej szczegółów znajduje się w dzienniku.</t>
+      <t id="55">Przejdę w tryb bezczynności i spróbuję ponownie później.</t>
+      <t id="56">Pójdę zmienić mój sprzęt na:\nStacja: %5%1 [%2]\033X\nRelacja: %6%3\033X\nSektor: %7%4\033X\n</t>
+      <t id="57">\nKoszt zmiany sprzętu: %1\n</t>
+      <t id="58">\nSprzedaję sprzęt za %1</t>
+      <t id="59">\nKupuję sprzęt za %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Niepowodzenie zmiany sprzętu\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Czas bezczynności</t>
+      <t id="81">Bezczynność: Przenieść do?</t>
+      <t id="82">Gdzie przenieść?</t>
+      <t id="83">Bezczynność: Podążać za?</t>
+      <t id="84">Za kim podążać?</t>
+      <t id="85">Bezczynność: Dokowanie?</t>
+      <t id="86">Znaleźć stację?</t>
+      <t id="87">Gdzie dokować?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Pokazać wiadomości?</t>
+      <t id="91">Zapisz do dziennika?</t>
+      <t id="92">Dodać tag zamówienia?</t>
+      <t id="93">Zapisać ustawienia zamówienia?</t>
+      <t id="94">Zresetować ustawienia zamówienia?</t>
+      <t id="95">Ustawienia zamówienia zapisane.</t>
+      <t id="96">Ustawienia zamówienia zresetowane.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- German ~~ Deutsch -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Sprungtore?</t>
+      <t id="2">Aktive Sprungtore?</t>
+      <t id="3">Inaktive Sprungtore?</t>
+      <t id="4">Beschleuniger?</t>
+      <t id="5">Aktive Beschleuniger?</t>
+      <t id="6">Inaktive Beschleuniger?</t>
+      <t id="7">Superhighways?</t>
+      <t id="8">Aktive Superhighways?</t>
+      <t id="9">Inaktive Superhighways?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stationen?</t>
+      <t id="11">Raumdocks?</t>
+      <t id="12">Schiffswerften?</t>
+      <t id="13">Ausrüstungsdocks?</t>
+      <t id="14">Handelsstationen?</t>
+      <t id="15">Piratenbasen?</t>
+      <t id="16">Schrottverarbeitungsanlagen?</t>
+      <t id="17">Verteidigungsstationen?</t>
+      <t id="18">Fraktionshauptquartiere?</t>
+      <t id="19">Fabriken?</t>
+      <t id="20">Baustellen?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Besitzerlose Sektoren?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Leerlauf</t>
+      <t id="41">Zum Sektor bewegen</t>
+      <t id="42">Zu Position bewegen</t>
+      <t id="43">Zu Objekt bewegen</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Derzeit gibt es keine verfügbaren Stationen, an denen wir unsere gewünschte Ausrüstung ändern könnten.</t>
+      <t id="51">Derzeit fehlen allen verfügbaren Stationen die benötigten Ressourcen zur Herstellung der benötigten Ausrüstung.\nIch werde zur nächstgelegenen Station gehen, eine Anfrage zur Auffüllung stellen und dann auf die nächste Ressourcennachfüllung warten.</t>
+      <t id="52">Uns fehlen die notwendigen Mittel, um die gewünschte Ausrüstung aufzufüllen.</t>
+      <t id="53">Der Prozess der Erstellung der Ausrüstungsänderung ist fehlgeschlagen.</t>
+      <t id="54">Der Befehl für die Ausrüstungsänderung ist fehlgeschlagen. Weitere Details finden Sie im Logbuch.</t>
+      <t id="55">Ich wechsle in den Leerlaufmodus und versuche es später erneut.</t>
+      <t id="56">Ich werde meine Ausrüstung wechseln bei:\nStation: %5%1 [%2]\033X\nBeziehung: %6%3\033X\nSektor: %7%4\033X\n</t>
+      <t id="57">\nAusrüstungswechselkosten: %1\n</t>
+      <t id="58">\nIch verkaufe Ausrüstung für %1</t>
+      <t id="59">\nIch kaufe Ausrüstung für %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Fehler beim Wechsel der Ausrüstung\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Leerlaufzeit</t>
+      <t id="81">Leerlauf: Bewegen zu?</t>
+      <t id="82">Wohin bewegen?</t>
+      <t id="83">Leerlauf: Folgen?</t>
+      <t id="84">Wem folgen?</t>
+      <t id="85">Leerlauf: Andocken?</t>
+      <t id="86">Eine Station finden?</t>
+      <t id="87">Wohin andocken?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Nachrichten anzeigen?</t>
+      <t id="91">Ins Logbuch schreiben?</t>
+      <t id="92">Befehls-Tag hinzufügen?</t>
+      <t id="93">Einstellungen speichern?</t>
+      <t id="94">Einstellungen zurücksetzen?</t>
+      <t id="95">Einstellungen wurden gespeichert.</t>
+      <t id="96">Einstellungen wurden zurückgesetzt.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Portuguese (Brazil) ~~ Português (Brasil) -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Portais de salto?</t>
+      <t id="2">Portais de salto ativos?</t>
+      <t id="3">Portais de salto inativos?</t>
+      <t id="4">Aceleradores?</t>
+      <t id="5">Aceleradores ativos?</t>
+      <t id="6">Aceleradores inativos?</t>
+      <t id="7">Superestradas?</t>
+      <t id="8">Superestradas ativas?</t>
+      <t id="9">Superestradas inativas?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Estações?</t>
+      <t id="11">Cais?</t>
+      <t id="12">Estaleiros?</t>
+      <t id="13">Docks de equipamentos?</t>
+      <t id="14">Estações de comércio?</t>
+      <t id="15">Bases piratas?</t>
+      <t id="16">Instalações de processamento de sucata?</t>
+      <t id="17">Estações de defesa?</t>
+      <t id="18">Quartéis-generais da facção?</t>
+      <t id="19">Fábricas?</t>
+      <t id="20">Locais de construção?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Setores sem dono?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Inativo</t>
+      <t id="41">Mover para o setor</t>
+      <t id="42">Mover para a posição</t>
+      <t id="43">Mover para o objeto</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Atualmente, não há estações disponíveis onde poderíamos reabastecer nosso equipamento desejado.</t>
+      <t id="51">Atualmente, todas as estações disponíveis não possuem os recursos necessários para fabricar o equipamento necessário.\nIrei para a estação mais próxima, farei um pedido de reabastecimento, e então aguardarei o próximo reabastecimento de recursos.</t>
+      <t id="52">Não temos os fundos necessários para reabastecer o equipamento desejado.</t>
+      <t id="53">O processo de criação do pedido de reabastecimento falhou.</t>
+      <t id="54">O pedido de reabastecimento do equipamento falhou. Mais detalhes estão disponíveis no registro.</t>
+      <t id="55">Vou mudar para o modo de inatividade e tentar novamente mais tarde.</t>
+      <t id="56">Vou mudar meu equipamento em:\nEstação: %5%1 [%2]\033X\nRelação: %6%3\033X\nSetor: %7%4\033X\n</t>
+      <t id="57">\nCusto da mudança de equipamento: %1\n</t>
+      <t id="58">\nVendo equipamento por %1</t>
+      <t id="59">\nCompro equipamento por %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Falha na mudança de equipamento\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Tempo ocioso</t>
+      <t id="81">Ocioso: Mover para?</t>
+      <t id="82">Para onde mover?</t>
+      <t id="83">Ocioso: Seguir?</t>
+      <t id="84">Quem seguir?</t>
+      <t id="85">Ocioso: Atracar?</t>
+      <t id="86">Encontrar uma estação?</t>
+      <t id="87">Onde atracar?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Mostrar mensagens?</t>
+      <t id="91">Escrever no livro de registro?</t>
+      <t id="92">Adicionar tag de ordem?</t>
+      <t id="93">Salvar configurações de ordem?</t>
+      <t id="94">Redefinir configurações de ordem?</t>
+      <t id="95">Configurações de ordem salvas.</t>
+      <t id="96">Configurações de ordem redefinidas.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Japanese ~~ やまと -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">ジャンプゲート?</t>
+      <t id="2">活動中のジャンプゲート?</t>
+      <t id="3">非活動中のジャンプゲート?</t>
+      <t id="4">加速器?</t>
+      <t id="5">活動中の加速器?</t>
+      <t id="6">非活動中の加速器?</t>
+      <t id="7">スーパーハイウェイ?</t>
+      <t id="8">活動中のスーパーハイウェイ?</t>
+      <t id="9">非活動中のスーパーハイウェイ?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">ステーション?</t>
+      <t id="11">ワーフ?</t>
+      <t id="12">造船所?</t>
+      <t id="13">装備ドック?</t>
+      <t id="14">取引ステーション?</t>
+      <t id="15">海賊基地?</t>
+      <t id="16">スクラップ処理施設?</t>
+      <t id="17">防衛ステーション?</t>
+      <t id="18">派閥本部?</t>
+      <t id="19">工場？</t>
+      <t id="20">建設現場？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">所有者なしのセクター？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">アイドル</t>
+      <t id="41">セクターに移動</t>
+      <t id="42">位置に移動</t>
+      <t id="43">オブジェクトに移動</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">現在、希望の設備を補充できる利用可能なステーションはありません。</t>
+      <t id="51">現在、全ての利用可能なステーションは必要な設備を製造するための必要なリソースが不足しています。\n最寄りのステーションに行き、補充を要求し、次のリソース補充を待つことにします。</t>
+      <t id="52">希望の設備を補充するための必要な資金が不足しています。</t>
+      <t id="53">補充注文の作成プロセスが失敗しました。</t>
+      <t id="54">設備補充の注文が失敗しました。詳細はログブックで確認できます。</t>
+      <t id="55">アイドルモードに切り替えて、後で再試行します。</t>
+      <t id="56">私の装備を変更する場所:\nステーション: %5%1 [%2]\033X\n関係: %6%3\033X\nセクター: %7%4\033X\n</t>
+      <t id="57">\n設備の変更費用：%1\n</t>
+      <t id="58">\n私は%1の設備を販売します</t>
+      <t id="59">\n私は%1の設備を購入します</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#装備変更失敗\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">アイドルタイム</t>
+      <t id="81">アイドル: 移動先?</t>
+      <t id="82">どこに移動する?</t>
+      <t id="83">アイドル: フォローする?</t>
+      <t id="84">誰をフォローする?</t>
+      <t id="85">アイドル: ドッキング?</t>
+      <t id="86">ステーションを見つける?</t>
+      <t id="87">どこにドックする?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">メッセージを表示しますか？</t>
+      <t id="91">ログブックに書き込みますか？</t>
+      <t id="92">オーダータグを追加しますか？</t>
+      <t id="93">オーダー設定を保存?</t>
+      <t id="94">オーダー設定をリセット?</t>
+      <t id="95">オーダー設定を保存しました。</t>
+      <t id="96">オーダー設定をリセットしました。</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Korean ~~ 한국인 -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">점프 게이트?</t>
+      <t id="2">활성화된 점프 게이트?</t>
+      <t id="3">비활성화된 점프 게이트?</t>
+      <t id="4">가속기?</t>
+      <t id="5">활성화된 가속기?</t>
+      <t id="6">비활성화된 가속기?</t>
+      <t id="7">슈퍼하이웨이?</t>
+      <t id="8">활성화된 슈퍼하이웨이?</t>
+      <t id="9">비활성화된 슈퍼하이웨이?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">스테이션?</t>
+      <t id="11">워프?</t>
+      <t id="12">조선소?</t>
+      <t id="13">장비 독?</t>
+      <t id="14">거래 스테이션?</t>
+      <t id="15">해적기지?</t>
+      <t id="16">스크랩 처리 시설?</t>
+      <t id="17">방어 스테이션?</t>
+      <t id="18">팩션 본부?</t>
+      <t id="19">공장?</t>
+      <t id="20">건설 현장?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">소유자 없는 섹터?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">대기 중</t>
+      <t id="41">섹터로 이동</t>
+      <t id="42">위치로 이동</t>
+      <t id="43">객체로 이동</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">현재 우리가 원하는 장비를 보충할 수 있는 이용 가능한 역은 없습니다.</t>
+      <t id="51">현재 모든 이용 가능한 역은 필요한 장비를 제조하기 위한 필요한 자원이 부족합니다.\n가장 가까운 역으로 가서 보충을 요청하고, 다음 자원 보충을 기다리겠습니다.</t>
+      <t id="52">원하는 장비를 보충하기 위한 필요한 자금이 부족합니다.</t>
+      <t id="53">보충 주문 생성 과정이 실패했습니다.</t>
+      <t id="54">장비 보충 주문이 실패했습니다. 로그북에서 자세한 내용을 확인할 수 있습니다.</t>
+      <t id="55">대기 모드로 전환하고 나중에 다시 시도하겠습니다.</t>
+      <t id="56">장비를 변경할 곳:\n스테이션: %5%1 [%2]\033X\n관계: %6%3\033X\n섹터: %7%4\033X\n</t>
+      <t id="57">\n장비 변경 비용: %1\n</t>
+      <t id="58">\n장비를 %1에 판매합니다</t>
+      <t id="59">\n장비를 %1에 구매합니다</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#장비 변경 실패\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">유휴 시간</t>
+      <t id="81">유휴: 이동할 곳?</t>
+      <t id="82">어디로 이동할까요?</t>
+      <t id="83">유휴: 팔로우?</t>
+      <t id="84">누구를 따를까요?</t>
+      <t id="85">유휴: 도킹?</t>
+      <t id="86">스테이션 찾기?</t>
+      <t id="87">어디에 도킹할까요?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">메시지를 표시할까요?</t>
+      <t id="91">로그북에 기록할까요?</t>
+      <t id="92">주문 태그를 추가할까요?</t>
+      <t id="93">주문 설정 저장?</t>
+      <t id="94">주문 설정 초기화?</t>
+      <t id="95">주문 설정이 저장되었습니다.</t>
+      <t id="96">주문 설정이 초기화되었습니다.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Simplified Chinese ~~ 简体中文 -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">跳跃门？</t>
+      <t id="2">活跃的跳跃门？</t>
+      <t id="3">不活跃的跳跃门？</t>
+      <t id="4">加速器？</t>
+      <t id="5">活跃的加速器？</t>
+      <t id="6">不活跃的加速器？</t>
+      <t id="7">超级公路？</t>
+      <t id="8">活跃的超级公路？</t>
+      <t id="9">不活跃的超级公路？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">空间站？</t>
+      <t id="11">码头？</t>
+      <t id="12">船厂？</t>
+      <t id="13">设备船坞？</t>
+      <t id="14">交易站？</t>
+      <t id="15">海盗基地？</t>
+      <t id="16">废料处理设施？</t>
+      <t id="17">防御站？</t>
+      <t id="18">派系总部？</t>
+      <t id="19">工厂？</t>
+      <t id="20">建筑工地？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">无主的区域？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">空闲</t>
+      <t id="41">移动到区域</t>
+      <t id="42">移动到位置</t>
+      <t id="43">移动到对象</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">目前，我们没有可以补充所需设备的可用站点。</t>
+      <t id="51">目前，所有可用的站点都缺乏制造所需设备的必要资源。\n我将去最近的站点，提出补货请求，然后等待下次资源补充。</t>
+      <t id="52">我们缺乏补充所需设备的必要资金。</t>
+      <t id="53">创建补货订单的过程失败了。</t>
+      <t id="54">补充设备订单失败。日志中有更多的细节。</t>
+      <t id="55">我将切换到空闲模式，稍后再试。</t>
+      <t id="56">我将在以下位置更换我的设备:\n空间站: %5%1 [%2]\033X\n关系: %6%3\033X\n区域: %7%4\033X\n</t>
+      <t id="57">\n更换设备的成本：%1\n</t>
+      <t id="58">\n我以%1的价格出售设备</t>
+      <t id="59">\n我以%1的价格购买设备</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#设备更换失败\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">空闲时间</t>
+      <t id="81">空闲：移动至？</t>
+      <t id="82">移动至何处？</t>
+      <t id="83">空闲：跟随？</t>
+      <t id="84">跟随谁？</t>
+      <t id="85">空闲：停靠？</t>
+      <t id="86">找一个空间站？</t>
+      <t id="87">停靠在何处？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">显示消息？</t>
+      <t id="91">写入日志簿？</t>
+      <t id="92">添加订单标签？</t>
+      <t id="93">保存订单设置？</t>
+      <t id="94">重置订单设置？</t>
+      <t id="95">订单设置已保存。</t>
+      <t id="96">订单设置已重置。</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="UTF-8"?>
+<!-- Traditional Chinese ~~ 繁體中文-->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">跳躍門？</t>
+      <t id="2">活躍的跳躍門？</t>
+      <t id="3">非活躍的跳躍門？</t>
+      <t id="4">加速器？</t>
+      <t id="5">活躍的加速器？</t>
+      <t id="6">非活躍的加速器？</t>
+      <t id="7">超級高速公路？</t>
+      <t id="8">活躍的超級高速公路？</t>
+      <t id="9">非活躍的超級高速公路？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">空間站？</t>
+      <t id="11">碼頭？</t>
+      <t id="12">船廠？</t>
+      <t id="13">設備船塢？</t>
+      <t id="14">交易站？</t>
+      <t id="15">海盜基地？</t>
+      <t id="16">廢料處理設施？</t>
+      <t id="17">防禦站？</t>
+      <t id="18">派系總部？</t>
+      <t id="19">工廠？</t>
+      <t id="20">建設工地？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">無主的區域？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">空閒</t>
+      <t id="41">移動到區域</t>
+      <t id="42">移動到位置</t>
+      <t id="43">移動到物件</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">目前，我們沒有可以補充所需設備的可用站點。</t>
+      <t id="51">目前，所有可用的站點都缺乏製造所需設備的必要資源。\n我將去最近的站點，提出補貨請求，然後等待下次資源補充。</t>
+      <t id="52">我們缺乏補充所需設備的必要資金。</t>
+      <t id="53">創建補貨訂單的過程失敗了。</t>
+      <t id="54">補充設備訂單失敗。日誌中有更多的細節。</t>
+      <t id="55">我將切換到空閒模式，稍後再試。</t>
+      <t id="56">我將在以下位置更換我的設備:\n空間站: %5%1 [%2]\033X\n關係: %6%3\033X\n區域: %7%4\033X\n</t>
+      <t id="57">\n更換設備的成本：%1\n</t>
+      <t id="58">\n我以%1的價格出售設備</t>
+      <t id="59">\n我以%1的價格購買設備</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#設備更換失敗\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">閒置時間</t>
+      <t id="81">閒置：移動至？</t>
+      <t id="82">移動至何處？</t>
+      <t id="83">閒置：跟隨？</t>
+      <t id="84">跟隨誰？</t>
+      <t id="85">閒置：對接？</t>
+      <t id="86">尋找一個空間站？</t>
+      <t id="87">對接至何處？</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">顯示訊息？</t>
+      <t id="91">寫入日誌簿？</t>
+      <t id="92">加入訂單標籤？</t>
+      <t id="93">儲存訂單設定？</t>
+      <t id="94">重置訂單設定？</t>
+      <t id="95">訂單設定已儲存。</t>
+      <t id="96">訂單設定已重置。</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language><?xml version="1.0" encoding="utf-8"?>
+<!-- Default ~~ English -->
+
+<language>
+   <page id="8888888" voice="no">
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- JP_ScriptLibrary -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="1">Jump Gates?</t>
+      <t id="2">Active Jump Gates?</t>
+      <t id="3">Inactive Jump Gates?</t>
+      <t id="4">Accelerators?</t>
+      <t id="5">Active Accelerators?</t>
+      <t id="6">Inactive Accelerators?</t>
+      <t id="7">Superhighways?</t>
+      <t id="8">Active Superhighways?</t>
+      <t id="9">Inactive Superhighways?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="10">Stations?</t>
+      <t id="11">Wharfs?</t>
+      <t id="12">Shipyards?</t>
+      <t id="13">Equipment Docks?</t>
+      <t id="14">Trading Stations?</t>
+      <t id="15">Pirate Bases?</t>
+      <t id="16">Scrap Processing Facilities?</t>
+      <t id="17">Defense Stations?</t>
+      <t id="18">Faction Headquarters?</t>
+      <t id="19">Factories?</t>
+      <t id="20">Construction Sites?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="30">Ownerless Sectors?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="40">Idle</t>
+      <t id="41">Move to Sector</t>
+      <t id="42">Move to Position</t>
+      <t id="43">Move to Object</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="50">Currently, there are no available stations where we could restock our desired equipment.</t>
+      <t id="51">Currently, all available stations lack the required resources to manufacture the necessary equipment.\nI will go to the nearest station, place a request for restocking, and then await the next resource replenishment.</t>
+      <t id="52">We lack the necessary funds to restock the desired equipment.</t>
+      <t id="53">The process of creating the restock order has failed.</t>
+      <t id="54">The restock equipment order has failed. More detail is available in the logbook.</t>
+      <t id="55">I will switch to idle mode and try again later.</t>
+      <t id="56">I'll go change my equipment at:\nStation: %5%1 [%2]\033X\nRelation: %6%3\033X\nSector: %7%4\033X\n</t>
+      <t id="57">\nEquipment change cost: %1\n</t>
+      <t id="58">\nI sell equipment for %1</t>
+      <t id="59">\nI buy equipment for %1</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="60">\033#FFe27100#Equipment Change Failure\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="80">Idle Time</t>
+      <t id="81">Idle: Move to?</t>
+      <t id="82">Where to move?</t>
+      <t id="83">Idle: Follow?</t>
+      <t id="84">Who to follow?</t>
+      <t id="85">Idle: Docking?</t>
+      <t id="86">Find a Station?</t>
+      <t id="87">Where to dock?</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="90">Show messages?</t>
+      <t id="91">Write to logbook?</t>
+      <t id="92">Add Order tag?</t>
+      <t id="93">Save Order Settings?</t>
+      <t id="94">Reset Order Settings?</t>
+      <t id="95">Order settings saved.</t>
+      <t id="96">Order settings reset.</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <t id="97">\033#B600CCCC#</t>
+      <t id="98">\033#FF00CC66#</t>
+      <t id="99">\033X</t>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   </page>
+</language>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content id="ws_2990696099" name="JP_ScriptLibrary" description="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#13;&#10;# What does &quot;_ScriptLibrary&quot; do for you?&#13;&#10;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#13;&#10;The '_ScriptLibrary' is a framework I've created that has simplified my modding process.&#13;&#10;It lets me write scripts just once and use them in multiple mods, minimizing code duplication and making updates more efficient.&#13;&#10;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#13;&#10;&#13;&#10;~~~~~~~~~~~~~&#13;&#10;# And at the end:&#13;&#10;~~~~~~~~~~~~~&#13;&#10;For suggestions, bug reports, feedback on translations, or if you feel something was left out in the description,&#13;&#10;please join my Discord server at https://discord.gg/UdWs6hX. Your input is crucial for the ongoing improvement of the script.&#13;&#10;Join the community, share your thoughts, and help shape its development.&#13;&#10;&#13;&#10;Feel free to reach out and contribute!&#13;&#10;&#13;&#10;Also available on: (Mods on Steam require the Steam version, while mods on Nexusmods necessitate the Nexusmods version)&#13;&#10;~ GitHub: https://github.com/JanPanthera/JP_X4Mods_2023/tree/main/JP_X4Mods_2023/JP_ScriptLibrary&#13;&#10;~ Nexus Mods: https://www.nexusmods.com/x4foundations/mods/1145/&#13;&#10;~ Steam: https://steamcommunity.com/workshop/filedetails/?id=2990696099" author="JanPanthera" version="103" date="2023-07-24" save="0" lastupdate="1690195121">
+  <text language="7" name="JP_ScriptLibrary" description="Это библиотека скриптов, используемых модами JP."></text>
+  <text language="33" name="JP_ScriptLibrary" description="Il s'agit d'une bibliothèque de scripts utilisés par les mods JP."></text>
+  <text language="34" name="JP_ScriptLibrary" description="Esta es una biblioteca de scripts utilizada por los mods JP."></text>
+  <text language="39" name="JP_ScriptLibrary" description="Questa è una biblioteca di script utilizzata dai mod JP."></text>
+  <text language="42" name="JP_ScriptLibrary" description="To jest biblioteka skryptów wykorzystywanych przez modyfikacje JP."></text>
+  <text language="44" name="JP_ScriptLibrary" description="This is a library of scripts utilized by JP mods."></text>
+  <text language="48" name="JP_ScriptLibrary" description="To jest biblioteka skryptów wykorzystywanych przez modyfikacje JP."></text>
+  <text language="49" name="JP_ScriptLibrary" description="Dies ist eine Bibliothek von Skripten, die von JP-Mods genutzt werden."></text>
+  <text language="55" name="JP_ScriptLibrary" description="Esta é uma biblioteca de scripts utilizada por mods JP."></text>
+  <text language="81" name="JP_ScriptLibrary" description="これはJPのmodによって使用されるスクリプトのライブラリーです。"></text>
+  <text language="82" name="JP_ScriptLibrary" description="이것은 JP 모드에서 사용하는 스크립트 라이브러리입니다."></text>
+  <text language="86" name="JP_ScriptLibrary" description="Simplified Chinese: 这是JP模组使用的脚本库。"></text>
+  <text language="88" name="JP_ScriptLibrary" description="Traditional Chinese: 這是JP模組使用的腳本庫。"></text>
+</content>
