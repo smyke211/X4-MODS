@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<content id="kirill_ai_chat" name="AI Chat" description="AI chat in main menu" version="106" author="Kirill" date="2026-04-22" save="false" sync="false">
-  <dependency id="sn_mod_support_apis" version="100" />
+<content id="kirill_ai_chat" name="AI Chat" description="AI chat via /ai command" version="106" author="Kirill" date="2026-04-22" save="false" sync="false">
+  <dependency id="ws_2042901274" version="100" optional="false"/>
 </content>
