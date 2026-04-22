@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mdscript name="Kirill_AI_Chat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <cues>
+
+    <cue name="Register_Command" instantiate="true">
+      <conditions>
+        <event_cue_signalled cue="md.Chat_Window_API.Reloaded" />
+      </conditions>
+      <actions>
+        <signal_cue_instantly cue="md.Chat_Window_API.Register_Command"
+          param="table[
+            $name = '/ai',
+            $callback = On_AI,
+            $echo = '[AI]'
+          ]" />
+      </actions>
+    </cue>
+
+    <cue name="On_AI" instantiate="true">
+      <conditions>
+        <event_cue_signalled />
+      </conditions>
+      <actions>
+        <set_value name="$text" exact="event.param.$text" />
+        <do_if value="$text == '' or $text == null">
+          <signal_cue_instantly cue="md.Chat_Window_API.Print"
+            param="'AI: Type /ai followed by your message'" />
+        </do_if>
+        <do_else>
+          <signal_cue_instantly cue="md.Chat_Window_API.Print"
+            param="'AI: %1'.[$text]" />
+          <signal_cue_instantly cue="Open_Menu" param="$text" />
+        </do_else>
+      </actions>
+    </cue>
+
+    <cue name="Open_Menu" instantiate="true">
+      <conditions>
+        <event_cue_signalled />
+      </conditions>
+      <actions>
+        <set_value name="$input" exact="event.param" />
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Create_Menu"
+          param="table[$columns = 1, $title = 'AI Chat']" />
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Add_Row" />
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Text"
+          param="table[$col = 1, $text = 'You: %1'.[$input]]" />
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Add_Row" />
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Text"
+          param="table[$col = 1, $text = 'AI: (response)']" />
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Add_Row" />
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Button"
+          param="table[$col = 1, $text = 'Close', $onClick = Close]" />
+      </actions>
+    </cue>
+
+    <cue name="Close" instantiate="true">
+      <conditions>
+        <event_cue_signalled />
+      </conditions>
+      <actions>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Close_Menu" />
+      </actions>
+    </cue>
+
+  </cues>
+</mdscript>
